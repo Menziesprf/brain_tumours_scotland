@@ -44,18 +44,16 @@ all_ann_inc_data_clean <- all_ann_inc_data %>%
 # Part A: AGES 
 
 all_ann_inc_data_ages <- all_ann_inc_data_clean %>% 
-    filter(str_detect(age_label, c("num_", "inc_", "Crude Rate \\(\\)"))) %>% 
-  mutate(age_label = str_replace(age_label, "Crude Rate ()", "inc_all"),
-         age_label = stri_replace_all_fixed(age_label, "()", "")) %>% 
-  mutate(inc_flag = case_when(str_detect(age_label, "num") ~ "num",
-                              T ~ "inc")) %>% 
-  mutate(age_label = str_replace_all(age_label, c("num_" = "", "inc_" = ""))) %>% 
+    filter(str_detect(age_label, c("num_", "inc_"))) %>% 
+  #mutate(age_label = str_replace(age_label, "Crude Rate ()", "inc_all"),
+         #age_label = stri_replace_all_fixed(age_label, "()", "")) %>% 
+  #mutate(inc_flag = case_when(str_detect(age_label, "num") ~ "num",
+                             # T ~ "inc")) %>% 
+  #mutate(age_label = str_replace_all(age_label, c("num_" = "", "inc_" = ""))) %>% 
   pivot_wider(names_from = inc_flag, 
-               values_from = values) %>% 
-  mutate()
+               values_from = values)
 
-filtered <- all_ann_inc_data_ages %>% 
-  filter(age_label != "all")
+
 
 
 
@@ -80,3 +78,19 @@ sum(is.na(all_ann_inc_data_clean))
 sum(is.na(all_ann_inc_data_ages))
 
 distinct(all_ann_inc_data_ages)
+
+all_ann_inc_data_clean %>% 
+  filter(!distinct(all_ann_inc_data_ages))
+
+summary(all_ann_inc_data_ages)
+
+filtered <- all_ann_inc_data_ages %>% 
+  filter(sex_label == "Males",
+         year == "1993",
+         hb_label == "SCOTLAND")
+
+filtered %>% 
+  summarise(across(.fns = ~sum(is.na(.x))))
+
+all_ann_inc_data_ages %>% 
+  summarise(across(.fns = ~sum(is.na(.x))))
