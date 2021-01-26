@@ -3,20 +3,21 @@ library(tidyverse)
 library(readxl)
 library(stringi)
 
-all_ann_inc_scotland <- read_xls("data/all_ann_inc.xls", sheet = 1)
-all_ann_inc_region <- read_xls("data/all_ann_inc.xls", sheet = 2)
-all_ann_inc_board <- read_xls("data/all_ann_inc.xls", sheet = 3)
-all_ann_notes_area <- read_xls("data/all_ann_inc.xls", sheet = 4)
-all_ann_notes_sex <- read_xls("data/all_ann_inc.xls", sheet = 5)
-all_ann_notes_cancer_type <- read_xls("data/all_ann_inc.xls", sheet = 6)
-all_ann_inc_data <- read_xls("data/all_ann_inc.xls", sheet = 7)
+# --------- DATASET 1: Annual Incidence -----------
 
-all_sum_inc_data <- read_xls("data/all_sum_inc.xls", sheet = 6)
+# all_ann_inc_scotland <- read_xls("data/all_ann_inc.xls", sheet = 1)
+# all_ann_inc_region <- read_xls("data/all_ann_inc.xls", sheet = 2)
+# all_ann_inc_board <- read_xls("data/all_ann_inc.xls", sheet = 3)
+# all_ann_notes_area <- read_xls("data/all_ann_inc.xls", sheet = 4)
+# all_ann_notes_sex <- read_xls("data/all_ann_inc.xls", sheet = 5)
+# all_ann_notes_cancer_type <- read_xls("data/all_ann_inc.xls", sheet = 6)
+ all_ann_inc_data <- read_xls("data/all_ann_inc.xls", sheet = 7)
+
+#all_sum_inc_data <- read_xls("data/all_sum_inc.xls", sheet = 6)
 
 #excel_sheets("data/all_ann_inc.xls")
 #excel_sheets("data/all_sum_inc.xls")
 
-#unique(all_ann_inc_data$trans1.1993)
 
 all_ann_inc_data_clean <- all_ann_inc_data %>%
   select(-id, -hbnew, -sitenew, -sexnew, -label) %>% 
@@ -26,7 +27,7 @@ all_ann_inc_data_clean <- all_ann_inc_data %>%
          trans1.1996 = as.double(trans1.1996),
          trans1.1997 = as.double(trans1.1997),
          trans1.1998 = as.double(trans1.1998),
-         trans1.1999 = as.double(trans1.1999)) %>% 
+         trans1.1999 = as.double(trans1.1999)) %>%
   pivot_longer(cols = trans1.1993:trans1.2017,
                names_to = "year",
                values_to = "values") %>% 
@@ -39,58 +40,54 @@ all_ann_inc_data_clean <- all_ann_inc_data %>%
                                    "80x4" = "80-84",
                                    "85x9" = "85-89",
                                    "All Ages" = "all",
-                                   "(Incidence)" = "")))
+                                   "(Incidence)" = "")),
+         sex_label = str_replace_all(sex_label,
+                                     c("All Persons" = "all",
+                                       "Males" = "male",
+                                       "Females" = "female")),
+         hb_label = str_to_lower(hb_label),
+         site_label = recode(site_label,
+                             "Malignant brain cancer" = "mal_brain",
+                             "Malignant brain cancer (incl pituitary gland, craniopharyngeal duct and pineal gland)" = "mal_brain_plus_glands",
+                             "Non-malignant brain cancer (incl pituitary gland, craniopharyngeal duct and pineal gland)" = "non_mal_plus_glands",
+                             "All brain and CNS tumours (malignant and non-malignant)" = "all")) %>% 
+  rename(hb = hb_label,
+         cancer_type = site_label,
+         sex = sex_label,
+         age = age_label)
 
 # Part A: AGES 
 
 all_ann_inc_data_ages <- all_ann_inc_data_clean %>% 
-    filter(str_detect(age_label, c("num_", "inc_"))) %>% 
-  #mutate(age_label = str_replace(age_label, "Crude Rate ()", "inc_all"),
-         #age_label = stri_replace_all_fixed(age_label, "()", "")) %>% 
-  #mutate(inc_flag = case_when(str_detect(age_label, "num") ~ "num",
-                             # T ~ "inc")) %>% 
-  #mutate(age_label = str_replace_all(age_label, c("num_" = "", "inc_" = ""))) %>% 
+  filter(str_detect(age, "num_|inc_|Crude Rate ()")) %>% 
+  filter(!str_detect(age, "Upper|Lower")) %>% 
+  mutate(age = str_replace(age, "Crude Rate ()", "inc_all"),
+         age = stri_replace_all_fixed(age, "()", "")) %>% 
+  mutate(inc_flag = case_when(str_detect(age, "num") ~ "num",
+                              T ~ "inc")) %>% 
+  mutate(age = str_replace_all(age, c("num_" = "", "inc_" = ""))) %>% 
   pivot_wider(names_from = inc_flag, 
-               values_from = values)
+               values_from = values) 
 
-
-
-
-
-
-#%>% 
-  #pivot_longer(cols = "inc_5":"sir_upper_95_percent_ci",
-              # names_to = "age_inc",
-              # values_to = "incidence")
   
- 
-unique(all_ann_inc_data_clean$age_label)
-unique(all_ann_inc_data$age_label)
+# PART B: Incidence + stats 
 
-names(all_ann_inc_data_ages)
-unique(all_ann_inc_data_ages$age_label)
-sum(is.na(all_ann_inc_data_ages$num))
-sum(is.na(all_ann_inc_data_ages$num))
+all_ann_inc_stats <- all_ann_inc_data_clean %>% 
+  filter(str_detect(age, "Crude|EASR|WASR|Standardised|SIR")) %>% 
+  mutate(age = recode(age,
+                      "Standardised  Ratio" = "SIR")) %>% 
+  pivot_wider(names_from = age,
+              values_from = values) %>%   # CONSIDER DROPPING SIR == 100.00000 only seem to be in scotland rows
+  clean_names()
 
-sum(is.na(all_ann_inc_data))
-sum(is.na(all_ann_inc_data_clean))
 
-sum(is.na(all_ann_inc_data_ages))
+rm(all_ann_inc_data, all_ann_inc_data_clean)
 
-distinct(all_ann_inc_data_ages)
+# ------------ DATASET 2:  ------------
 
-all_ann_inc_data_clean %>% 
-  filter(!distinct(all_ann_inc_data_ages))
 
-summary(all_ann_inc_data_ages)
 
-filtered <- all_ann_inc_data_ages %>% 
-  filter(sex_label == "Males",
-         year == "1993",
-         hb_label == "SCOTLAND")
 
-filtered %>% 
-  summarise(across(.fns = ~sum(is.na(.x))))
 
-all_ann_inc_data_ages %>% 
-  summarise(across(.fns = ~sum(is.na(.x))))
+
+# ------------- END ---------------
