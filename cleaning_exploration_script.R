@@ -5,30 +5,19 @@ library(stringi)
 
 # --------- DATASET 1: Annual Incidence -----------
 
-# all_ann_inc_scotland <- read_xls("data/all_ann_inc.xls", sheet = 1)
-# all_ann_inc_region <- read_xls("data/all_ann_inc.xls", sheet = 2)
-# all_ann_inc_board <- read_xls("data/all_ann_inc.xls", sheet = 3)
-# all_ann_notes_area <- read_xls("data/all_ann_inc.xls", sheet = 4)
-# all_ann_notes_sex <- read_xls("data/all_ann_inc.xls", sheet = 5)
-# all_ann_notes_cancer_type <- read_xls("data/all_ann_inc.xls", sheet = 6)
- all_ann_inc_data <- read_xls("data/all_ann_inc.xls", sheet = 7)
+excel_sheets("data/cancer-incidence-brain-and-cns.xls")
 
-#all_sum_inc_data <- read_xls("data/all_sum_inc.xls", sheet = 6)
-
-#excel_sheets("data/all_ann_inc.xls")
-#excel_sheets("data/all_sum_inc.xls")
-
+all_ann_inc_data <- read_xls("data/cancer-incidence-brain-and-cns.xls", sheet = 7)
 
 all_ann_inc_data_clean <- all_ann_inc_data %>%
   select(-id, -hbnew, -sitenew, -sexnew, -label) %>% 
-  mutate(trans1.1993 = as.double(trans1.1993),
-         trans1.1994 = as.double(trans1.1994),
+  mutate(trans1.1994 = as.double(trans1.1994),
          trans1.1995 = as.double(trans1.1995),
          trans1.1996 = as.double(trans1.1996),
          trans1.1997 = as.double(trans1.1997),
          trans1.1998 = as.double(trans1.1998),
          trans1.1999 = as.double(trans1.1999)) %>%
-  pivot_longer(cols = trans1.1993:trans1.2017,
+  pivot_longer(cols = trans1.1994:trans1.2018,
                names_to = "year",
                values_to = "values") %>% 
   mutate(year = str_replace(year, "trans1.", ""),
@@ -58,7 +47,7 @@ all_ann_inc_data_clean <- all_ann_inc_data %>%
 
 # 1A: AGES 
 
-all_ann_inc_data_ages <- all_ann_inc_data_clean %>% 
+incidence_all_ages <- all_ann_inc_data_clean %>% 
   filter(str_detect(age, "num_|inc_|Crude Rate ()")) %>% 
   filter(!str_detect(age, "Upper|Lower")) %>% 
   mutate(age = str_replace(age, "Crude Rate ()", "inc_all"),
@@ -72,7 +61,7 @@ all_ann_inc_data_ages <- all_ann_inc_data_clean %>%
   
 # 1B: Incidence + stats 
 
-all_ann_inc_stats <- all_ann_inc_data_clean %>% 
+incidence_all_stats <- all_ann_inc_data_clean %>% 
   filter(str_detect(age, "Crude|EASR|WASR|Standardised|SIR")) %>% 
   mutate(age = recode(age,
                       "Standardised  Ratio" = "SIR")) %>% 
@@ -87,10 +76,9 @@ rm(all_ann_inc_data, all_ann_inc_data_clean)
 
 # ------------ DATASET 2: Mortality  ------------
 
-excel_sheets("data/mal_ann_mort.xls")
+
 excel_sheets("data/mal_cns_ann_mort.xls")
 
-#mal_cns_mort_scotland <- read_xls("data/mal_cns_ann_mort.xls", sheet = 1)
 mal_cns_mort_data <- read_xls("data/mal_cns_ann_mort.xls", sheet = 7)
 
 mortality_clean <- mal_cns_mort_data %>% 
@@ -146,27 +134,111 @@ mort_stats <- mortality_clean %>%
 
 rm(mal_cns_mort_data, mortality_clean)
 
+
 # ----------- DATASET 3: SURVIVAL ---------
 
-excel_sheets("data/mal_cns_survival.xlsx")
+excel_sheets("data/estimates-of-survival-from-brain-and-other-cns-cancers.xlsx")
 
-survival 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+survival_all_data <- read_xlsx("data/estimates-of-survival-from-brain-and-other-cns-cancers.xlsx", sheet = 5) %>% 
+  clean_names()
+
+survival_notes <- read_xlsx("data/estimates-of-survival-from-brain-and-other-cns-cancers.xlsx", sheet = 6)
+survival_notes2 <- read_xlsx("data/estimates-of-survival-from-brain-and-other-cns-cancers.xlsx", sheet = 7)
+
+# survival @ 1, 3 5 & 10 years 1987 - 2017
+# Brain and other CNS (ICD-9 191-192; ICD-10 C70-C72, C75.1-C75.3)
 
 
+survival_clean <- survival_all_data %>% 
+  mutate(across(.cols = observed_survival_percent:upper_95_percent_ci_for_net_survival, 
+                .fns = as.double)) %>% 
+  select(-cancer_site_grouping)
+  
+  
+rm(survival_all_data, survival_notes, survival_notes2)
+# ----------- DATASET 4: DEPRIVATION ---------
+
+
+excel_sheets("data/deprivation-brain-and-cns.xls")
+
+# Incidence per SIMD quintile 2014 - 2018
+
+deprivation_incidence_data <- read_xls("data/deprivation-brain-and-cns.xls", sheet = 1, range = "A11:G18", col_names = T) %>% 
+  clean_names() 
+
+
+deprivation_incidence_clean <- deprivation_incidence_data %>% 
+  select(-x2, -x4) %>% 
+  filter(!is.na(easr)) %>% 
+  rename(incidence_easr = easr,
+         inc_lower_ci_95 = lower_95_percent_ci,
+         inc_upper_ci_95 = upper_95_percent_ci)
+      
 
 
 
+
+excel_sheets("data/mal_cns_deprivation.xls")
+
+# incidence per SIMD quintile 2013-2017, mortality rate 2014-2018 
+
+deprivation_mortality_data <- read_xls("data/mal_cns_deprivation.xls", sheet = 1, range = "A11:M18", col_names = T) %>%
+  clean_names()
+
+deprivation_mortality_clean <- deprivation_mortality_data %>% 
+  select(simd_2016_deprivation_quintile, 
+         number_of_death_registrations, 
+         easr_11, 
+         lower_95_percent_ci_12, 
+         upper_95_percent_ci_13) %>% 
+  filter(!is.na(easr_11)) %>% 
+  rename(mortality_easr = easr_11,
+         mort_lower_ci_95 = lower_95_percent_ci_12,
+         mort_upper_ci_95 = upper_95_percent_ci_13)
+
+deprivation_complete <- deprivation_incidence_clean %>% 
+  left_join(deprivation_mortality_clean, by = "simd_2016_deprivation_quintile")
+
+
+# USED INCIDENCE FROM 'A' and mortality rate from 'B'
+
+# Uses EASR 
+
+# Incidence TREND TEST - poisson regression = 0.067500000000000004
+
+# Mortality TREND TEST - poisson regression = 0.061100000000000002
+
+# Incidence and mortality for Malignant brain cancer (including pituitary gland, craniopharyngeal duct and pineal gland) 
+                              # (ICD-10 C70-C72, C75.1-C75.3)
+
+# DATA FOR ALL CANCERS: excel_sheets("data/deprivation-estimates-of-survival-from-all-cancers.xlsx")
+
+# deprivation_all_cancers <- read_xlsx("data/deprivation-estimates-of-survival-from-all-cancers.xlsx", sheet = 3)
+
+
+rm(deprivation_incidence_data, deprivation_incidence_clean,
+   deprivation_mortality_data, deprivation_mortality_clean)
+# ------------------- DATASET 5: RISK ---------------------
+
+# NOT A PRIORITY
+
+#excel_sheets("data/mal_cns_risk.xls")
+
+#risk_scotland <- read_xls("data/mal_cns_risk.xls", sheet = 1)
+#risk_data <- read_xls("data/mal_cns_risk.xls", sheet = 4)
+
+
+
+
+# ----------- DATASET 6: PREVALENCE ---------
+
+excel_sheets("data/mal_cns_prev.xls")
+
+#prev_scotland <- read_xls("data/mal_cns_prev.xls", sheet = 1)
+#prev_data <- read_xls("data/mal_cns_prev.xls", sheet = 4)
 
 
 # ------------- END ---------------
+
+
+
