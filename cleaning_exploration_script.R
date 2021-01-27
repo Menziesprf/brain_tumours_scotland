@@ -147,13 +147,16 @@ survival_notes2 <- read_xlsx("data/estimates-of-survival-from-brain-and-other-cn
 
 # survival @ 1, 3 5 & 10 years 1987 - 2017
 # Brain and other CNS (ICD-9 191-192; ICD-10 C70-C72, C75.1-C75.3)
-
+# NA's when less than 10 patients alive at 1, 5 or 10 years or when there is little change from previous time period
+# NA's dropped 
 
 survival_clean <- survival_all_data %>% 
   mutate(across(.cols = observed_survival_percent:upper_95_percent_ci_for_net_survival, 
                 .fns = as.double)) %>% 
-  select(-cancer_site_grouping)
+  select(-cancer_site_grouping) %>% 
+  drop_na()
   
+summary(survival_clean)
   
 rm(survival_all_data, survival_notes, survival_notes2)
 # ----------- DATASET 4: DEPRIVATION ---------
@@ -218,6 +221,8 @@ deprivation_complete <- deprivation_incidence_clean %>%
 
 rm(deprivation_incidence_data, deprivation_incidence_clean,
    deprivation_mortality_data, deprivation_mortality_clean)
+
+
 # ------------------- DATASET 5: RISK ---------------------
 
 # NOT A PRIORITY
@@ -232,10 +237,53 @@ rm(deprivation_incidence_data, deprivation_incidence_clean,
 
 # ----------- DATASET 6: PREVALENCE ---------
 
+
 excel_sheets("data/mal_cns_prev.xls")
 
-#prev_scotland <- read_xls("data/mal_cns_prev.xls", sheet = 1)
-#prev_data <- read_xls("data/mal_cns_prev.xls", sheet = 4)
+prev_scotland <- read_xls("data/mal_cns_prev.xls", sheet = 1)
+prev_data <- read_xls("data/mal_cns_prev.xls", sheet = 4)
+
+prevalence_clean <- prev_data %>% 
+  select(-id, -sitenew, -sexnew, -section) %>% 
+  rename(number_cases = stat.1,
+         rate_per_100k = stat.2,
+         "%_prev_in_pop" = stat.3,
+         "%_in_age_or_time_group" = stat.4) %>% 
+  mutate(site_label = recode(site_label,
+                             "Malignant brain cancer" = "mal_brain",
+                             "Malignant brain cancer (incl pituitary gland, craniopharyngeal duct and pineal gland)" = "mal_brain_plus_glands"),
+         sex_label = recode(sex_label,
+                            "All Persons" = "all",
+                            "Males" = "male",
+                            "Females" = "female"))
+
+age_groups_prev <- c("Under 45", "45-64", "65+", "All Ages")
+
+
+
+prevalence_age_groups <- prevalence_clean %>% 
+  filter(sectlab %in% age_groups_prev) %>% 
+  rename(age_group = sectlab,
+         cancer_site = site_label,
+         sex = sex_label) %>% 
+  mutate(age_group = recode(age_group,
+                            "Under 45" = "< 45",
+                            "All Ages" = "all"))
+
+prevalence_diagnosis_groups <- prevalence_clean %>% 
+  filter(!sectlab %in% age_groups_prev) %>% 
+  rename(years_since_diagnosis = sectlab,
+         cancer_site = site_label,
+         sex = sex_label) %>% 
+  mutate(years_since_diagnosis = recode(years_since_diagnosis,
+                                        "Up to 1 year" = "< 1",
+                                        "> 1 to 5 years" = "1 - 5",
+                                        "> 5 to 10 years" = "6 - 10",
+                                        "> 10 to 20 years" = "11 - 20",
+                                        "Total up to 20 years" = "≤ 20"))
+
+
+rm(prev_scotland, prev_data, prevalence_clean, age_groups_prev)
 
 
 # ------------- END ---------------
