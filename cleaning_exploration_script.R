@@ -21,6 +21,7 @@ all_ann_inc_data_clean <- all_ann_inc_data %>%
                names_to = "year",
                values_to = "values") %>% 
   mutate(year = str_replace(year, "trans1.", ""),
+         year = as.double(year),
          age_label = str_replace_all(age_label, 
                                  c("Number of registrations: " = "num_", 
                                    "Incidence rate: " = "inc_",
@@ -56,7 +57,9 @@ incidence_all_ages <- all_ann_inc_data_clean %>%
                               T ~ "incidence")) %>% 
   mutate(age = str_replace_all(age, c("num_" = "", "inc_" = ""))) %>% 
   pivot_wider(names_from = inc_flag, 
-               values_from = values) 
+               values_from = values) %>% 
+  mutate(age = recode(age,
+                      "5.." = "05-09"))
 
   
 # 1B: Incidence + stats 
@@ -67,7 +70,10 @@ incidence_all_stats <- all_ann_inc_data_clean %>%
                       "Standardised  Ratio" = "SIR")) %>% 
   pivot_wider(names_from = age,
               values_from = values) %>%   # CONSIDER DROPPING SIR == 100.00000 only seem to be in scotland rows
-  clean_names()
+  clean_names() %>% 
+  pivot_longer(cols = crude_rate:sir_upper_95_percent_ci,
+              names_to = "value_type",
+               values_to = "value")
 
 
   

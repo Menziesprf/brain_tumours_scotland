@@ -14,25 +14,214 @@ source("cleaning_exploration_script.R")
 
 ### Incidence
 
+```{r}
+incidence_all_ages %>%
+  drop_na() %>% 
+  filter(sex == "all",
+         cancer_type == "mal_brain",
+         age == "all",
+         hb != "scotland") %>% 
+  ggplot() +
+  aes(x = year, y = incidence) +
+  geom_line() +
+  facet_wrap(~ hb) +
+  labs(title = "Malignant tumours")
+
+incidence_all_ages %>%
+  drop_na() %>% 
+  filter(sex == "all",
+         cancer_type == "mal_brain",
+         age == "all",
+         hb != "scotland") %>% 
+  ggplot() +
+  aes(x = year, y = num_cases) +
+  geom_line() +
+  facet_wrap(~ hb) +
+  labs(title = "Malignant tumours")
+```
+
+* Big fluctuations in Incidence in Orkney, shetland, western isles and borders due to small population
+
+* Largest number of cases in SE, West and North of Scotland and greater glasgow, but a similar incidence compared to other hb areas/across scotland as a whole 
+
+```{r}
+incidence_all_ages %>%
+  drop_na() %>% 
+  filter(sex == "all",
+         cancer_type == "all",
+         age == "all",
+         hb != "scotland") %>% 
+  ggplot() +
+  aes(x = year, y = incidence) +
+  geom_line() +
+  facet_wrap(~ hb) +
+  labs(title = "All tumours")
+
+incidence_all_ages %>% 
+  drop_na() %>% 
+  filter(sex == "all",
+         cancer_type == "all",
+         age == "all",
+         hb != "scotland") %>% 
+  ggplot() +
+  aes(x = year, y = num_cases) +
+  geom_line() +
+  facet_wrap(~ hb)+
+  labs(title = "All tumours")
+```
+
+* Same take aways as above
+
+
+```{r}
+incidence_all_ages %>% 
+  filter(hb == "scotland",
+         sex == "all",
+         age == "all",
+         cancer_type == "mal_brain")
+```
+
+* 357 Malignant brain tumours in 1994, 17 pituitary gland, craniopharyngeal duct and pineal gland tumours. Incidence 7 per 100k 
+
+* 451 Malignant brain tumours in 2018, 19 pituitary gland, craniopharyngeal duct and pineal gland tumours, 496 non-malignant brain tumours. 8.3 per 100k 
+
+* In 2018 1.2 people were diagnosed per day with a malignant brain tumour
 
 
 
+```{r}
+incidence_all_ages %>%
+  drop_na() %>% 
+  filter(sex == "all",
+         age == "all",
+         hb == "scotland") %>% 
+  ggplot() +
+  aes(x = year, y = incidence) +
+  geom_line() +
+  facet_wrap(~ cancer_type)+
+  labs(title = "Scotland")
+
+incidence_all_ages %>% 
+  drop_na() %>% 
+  filter(sex == "all",
+         age == "all",
+         hb == "scotland") %>% 
+  ggplot() +
+  aes(x = year, y = num_cases) +
+  geom_line() +
+  facet_wrap(~ cancer_type)+
+  labs(title = "Scotland")
+```
+
+* Increase in cases and incidence across Scotland between 1994 and 2018. Peaked at 2013.
+
+* The biggest change seems to be in non-malignant tumours
+
+* Not a massive change in incidence in malignant tumours 
 
 
 
+```{r}
+incidence_all_stats %>%  
+  drop_na() %>% 
+  filter(value_type %in% c("crude_rate", "easr", "wasr"),
+         hb != "scotland",
+         sex == "all",
+         cancer_type == "mal_brain") %>% 
+  ggplot() +
+  aes(x = year, y = value, colour = value_type) +
+  geom_line() +
+  facet_wrap(~ hb)
+```
+
+* Again lots of fluctuation due to small populations in health boards
+* WASR consistently lower
+* EASR and crude rate seem pretty similar, EASR a touch higher than crude_rate, suggesting scotland has lower incidence than they should compared to europe?
+
+```{r}
+incidence_all_stats %>%
+  drop_na() %>% 
+  filter(value_type %in% c("crude_rate", "easr", "wasr"),
+         hb == "scotland",
+         cancer_type == "mal_brain") %>% 
+  ggplot() +
+  aes(x = year, y = value, colour = value_type) +
+  geom_line() +
+  facet_wrap(~ sex)
+```
+
+* As above regarding rates
+
+* Male rate is significantly higher than female rate.
 
 
+* Is this the same across age groups 
+
+```{r}
+incidence_all_ages %>%
+  drop_na() %>% 
+  filter(age != "all",
+         hb == "scotland",
+         cancer_type == "mal_brain") %>% 
+  ggplot() +
+  aes(x = year, y = incidence, colour = sex) +
+  geom_line() +
+  facet_wrap(~ age)+
+  labs(title = "Scotland, malignant")
+
+incidence_all_ages %>%
+  drop_na() %>% 
+  filter(age != "all",
+         hb == "scotland",
+         cancer_type == "mal_brain") %>% 
+  ggplot() +
+  aes(x = year, y = num_cases, colour = sex) +
+  geom_line() +
+  facet_wrap(~ age)+
+  labs(title = "Scotland, malignant")
+
+incidence_all_ages %>%
+  drop_na() %>% 
+  filter(age != "all",
+         hb == "scotland",
+         cancer_type == "non_mal_plus_glands") %>% 
+  ggplot() +
+  aes(x = year, y = incidence, colour = sex) +
+  geom_line() +
+  facet_wrap(~ age)+
+  labs(title = "Scotland, non_mal")
+
+incidence_all_ages %>%
+  drop_na() %>% 
+  filter(age != "all",
+         hb == "scotland",
+         cancer_type == "non_mal_plus_glands") %>% 
+  ggplot() +
+  aes(x = year, y = num_cases, colour = sex) +
+  geom_line() +
+  facet_wrap(~ age)+
+  labs(title = "Scotland, non_mal")
+```
+
+* Malignant tumours:
+* Incidence is highest in Males in all age groups
+* Incidence is highest in 50 +, and increase in each age group from 50 onwards with a certain amount of annual fluctation
+
+* Non-malignant:
+* Incidence is higher in Females
+* Starts to rise 45 ish... and from 70 onwards.
+* Big increase from 2008ish? in elderly population
 
 
+```{r}
+incidence_all_ages %>% 
+  filter(year == 2018,
+         sex != "all",
+         hb == "scotland",
+         cancer_type %in% c("mal_brain", "non_mal_plus_glands"))
+```
 
-
-
-
-
-
-
-
-
+# Mortality
 
 
 
