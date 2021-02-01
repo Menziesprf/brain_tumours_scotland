@@ -40,7 +40,9 @@ all_ann_inc_data_clean <- all_ann_inc_data %>%
                              "Malignant brain cancer" = "mal_brain",
                              "Malignant brain cancer (incl pituitary gland, craniopharyngeal duct and pineal gland)" = "mal_brain_plus_glands",
                              "Non-malignant brain cancer (incl pituitary gland, craniopharyngeal duct and pineal gland)" = "non_mal_plus_glands",
-                             "All brain and CNS tumours (malignant and non-malignant)" = "all")) %>% 
+                             "All brain and CNS tumours (malignant and non-malignant)" = "all"),
+         hb_label = recode(hb_label,
+                           "highland and argyll" = "highland")) %>% 
   rename(hb = hb_label,
          cancer_type = site_label,
          sex = sex_label,
@@ -151,7 +153,10 @@ excel_sheets("data/estimates-of-survival-from-brain-and-other-cns-cancers.xlsx")
 survival_all_data <- read_xlsx("data/estimates-of-survival-from-brain-and-other-cns-cancers.xlsx", sheet = 5) %>% 
   clean_names()
 
-survival_notes <- read_xlsx("data/estimates-of-survival-from-brain-and-other-cns-cancers.xlsx", sheet = 6)
+survival_notes <- read_xlsx("data/estimates-of-survival-from-brain-and-other-cns-cancers.xlsx", sheet = 6) %>% 
+  pull()
+
+survival_notes
 survival_notes2 <- read_xlsx("data/estimates-of-survival-from-brain-and-other-cns-cancers.xlsx", sheet = 7)
 
 # survival @ 1, 3 5 & 10 years 1987 - 2017
@@ -164,6 +169,11 @@ survival_clean <- survival_all_data %>%
                 .fns = as.double)) %>% 
   select(-cancer_site_grouping) %>% 
   drop_na()
+
+survival_clean_nas <- survival_all_data %>% 
+  mutate(across(.cols = observed_survival_percent:upper_95_percent_ci_for_net_survival, 
+                .fns = as.double)) %>% 
+  select(-cancer_site_grouping) 
   
 summary(survival_clean)
   
@@ -428,8 +438,58 @@ pop_2019_all_clean <- pop_2019_all %>%
   group_by(over_65) %>% 
   mutate(percentage_pop = (count_over_65/total_pop*100))
 
+pop_2017_all <- read_csv("data/census/mid-year-pop-est-19-time-series-3/mid-year-pop-est-19-time-series-3_2017.csv",
+                         skip = 2, col_names = TRUE, n_max = 17)
+
+# hb codes are out of date
+pop_2017_all_clean <- pop_2017_all %>% 
+  drop_na() %>% 
+  rename(hb = Persons) %>% 
+  select(-"All Ages", -Code) %>% 
+  filter(hb != "Scotland") %>% 
+  pivot_longer(cols = "0":"90+",
+               names_to = "age",
+               values_to = "count") %>% 
+  mutate(age = recode(age,
+                      "90+" = "90"),
+         age = as.numeric(age),
+         over_65 = case_when(age < 65 ~ "under_65",
+                             T ~ "over_65")) %>% 
+  group_by(over_65, hb) %>% 
+  mutate(count_over_65 = sum(count)) %>%
+  select(-age, -count) %>% 
+  distinct() %>%
+  ungroup() %>% 
+  group_by(hb) %>% 
+  mutate(total_pop = sum(count_over_65)) %>% 
+  group_by(over_65) %>% 
+  mutate(percentage_pop = (count_over_65/total_pop*100))
+
 rm(pop_2019_female, pop_2019_female_clean, pop_2019_male, 
-   pop_2019_male_clean, groups, pop_2019_all)
+   pop_2019_male_clean, groups, pop_2019_all, pop_2017_all)
+
+
+# -------------- Map prep -------------
+
+hb_code_df<- pop_2019_all_clean %>%
+  ungroup() %>% 
+  select(hb, Code) %>% 
+  distinct() %>% 
+  mutate(hb = str_to_lower(hb))
+
+health_boards <- c("Ayrshire and Arran", "Borders", "Dumfries and Galloway", "Fife", 
+                    "Forth Valley", "Grampian", "Greater Glasgow and Clyde", "Highland", 
+                    "Lanarkshire", "Lothian", "Orkney", "Shetland", "Tayside", "Western Isles") %>% 
+  str_to_lower()
+
+#hb_codes <- c("S08000015", "S08000016", "S08000017", "S08000019", "S08000020", "S08000022", "S08000024",
+              #"S08000025", "S08000026", "S08000028", "S08000029", "S08000030", "S08000031", "S08000032")
+
+# Incidence
+
+incidence_map_prep <- incidence_all_stats %>% 
+  filter(hb %in% health_boards) %>% 
+  left_join(hb_code_df, by = "hb")
 
 
 # ------------- END ---------------

@@ -20,7 +20,7 @@ incidence_all_ages %>%
   filter(sex == "all",
          cancer_type == "mal_brain",
          age == "all",
-         hb != "scotland") %>% 
+         !str_detect(hb, "scotland")) %>% 
   ggplot() +
   aes(x = year, y = incidence) +
   geom_line() +
@@ -32,7 +32,7 @@ incidence_all_ages %>%
   filter(sex == "all",
          cancer_type == "mal_brain",
          age == "all",
-         hb != "scotland") %>% 
+         !str_detect(hb, "scotland")) %>% 
   ggplot() +
   aes(x = year, y = num_cases) +
   geom_line() +
@@ -343,6 +343,110 @@ survival_clean %>%
   filter(years_since_diagnosis == 10,
          age_group == "15-74")
 ```
+```{r}
+unique(survival_clean$age_group)
+```
+
+
+```{r}
+survival_clean %>% 
+  filter(age_group %in% c("15-44", "45-54", "55-64", "65-74", "75-99"),
+         sex == "Male",
+         years_since_diagnosis == 1) %>% 
+  ggplot() +
+  aes(x = age_group, y = net_survival_percent, fill = age_group) +
+  geom_col() +
+  facet_wrap(~ calendar_period_of_diagnosis, ncol = 1) +
+  coord_flip() +
+  labs(title = "1 year sruvival, male")
+  
+ survival_clean %>% 
+  filter(age_group %in% c("15-44", "45-54", "55-64", "65-74", "75-99"),
+         sex == "Female",
+         years_since_diagnosis == 1) %>% 
+  ggplot() +
+  aes(x = age_group, y = net_survival_percent, fill = age_group) +
+  geom_col() +
+  facet_wrap(~ calendar_period_of_diagnosis, ncol = 1) +
+   coord_flip() +
+   labs(title = "1 year survival, female")
+```
+
+```{r}
+survival_clean %>% 
+  filter(age_group %in% c("15-44", "45-54", "55-64", "65-74", "75-99"),
+         sex == "Male",
+         years_since_diagnosis == 5) %>% 
+  ggplot() +
+  aes(x = age_group, y = net_survival_percent, fill = age_group) +
+  geom_col() +
+  scale_y_continuous(n.breaks = 5) +
+  facet_wrap(~ calendar_period_of_diagnosis, ncol = 1) +
+  coord_flip() +
+  labs(title = "5 year sruvival, male")
+  
+ survival_clean %>% 
+  filter(age_group %in% c("15-44", "45-54", "55-64", "65-74", "75-99"),
+         sex == "Female",
+         years_since_diagnosis == 5) %>% 
+  ggplot() +
+  aes(x = age_group, y = net_survival_percent, fill = age_group) +
+  geom_col() +
+   scale_y_continuous(n.breaks = 10) +
+  facet_wrap(~ calendar_period_of_diagnosis, ncol = 1) +
+   coord_flip() +
+   labs(title = "5 year survival, female")
+```
+
+```{r}
+survival_clean %>% 
+  filter(age_group %in% c("15-44", "45-54", "55-64", "65-74", "75-99"),
+         sex == "Male",
+         years_since_diagnosis == 10) %>% 
+  ggplot() +
+  aes(x = age_group, y = net_survival_percent, fill = age_group) +
+  geom_col() +
+  scale_y_continuous(n.breaks = 5) +
+  facet_wrap(~ calendar_period_of_diagnosis, ncol = 1) +
+  coord_flip() +
+  labs(title = "10 year sruvival, male")
+  
+ survival_clean %>% 
+  filter(age_group %in% c("15-44", "45-54", "55-64", "65-74", "75-99"),
+         sex == "Female",
+         years_since_diagnosis == 10) %>% 
+  ggplot() +
+  aes(x = age_group, y = net_survival_percent, fill = age_group) +
+  geom_col() +
+   scale_y_continuous(n.breaks = 10) +
+  facet_wrap(~ calendar_period_of_diagnosis, ncol = 1) +
+   coord_flip() +
+   labs(title = "10 year survival, female")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Age
 
@@ -500,8 +604,47 @@ pop_2019_all_clean %>%
   aes(x = over_65, y = percentage_pop) +
   geom_col() +
   facet_wrap(~ hb)
+
+pop_2019_all_clean %>% 
+  filter(over_65 == "over_65") %>% 
+  ggplot() +
+  aes(x = hb, y = percentage_pop) +
+  geom_col()
+
+pop_2017_all_clean %>% 
+  filter(over_65 == "over_65") %>% 
+  ggplot() +
+  aes(x = hb, y = percentage_pop) +
+  geom_col()
 ```
 
+# Correlation
+
+```{r}
+incidence_all_ages %>% 
+  filter(hb == "scotland",
+         cancer_type == "all",
+         sex == "all") %>% 
+  ggplot() +
+  aes(x = age, y = incidence, colour = year) +
+  geom_point()
+```
+
+```{r}
+incidence_all_ages %>% 
+  filter(hb == "scotland",
+         cancer_type == "all",
+         sex == "all",
+         age != "all") %>%
+  drop_na() %>% 
+  mutate(age = str_extract(age, "[0-9]+[-+]"),
+         age = str_remove_all(age, "[-+]"),
+         age = as.numeric(age)) %>% 
+  summarise(cor(age, incidence))
+```
+* Pretty sketchy and probably isn't statistically significant as the data is binned but perhaps shows that if the full data was available that a significant positive correlation is present. 
+
+* wots the point of including this?
 
 
 

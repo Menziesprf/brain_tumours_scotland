@@ -9,22 +9,37 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+* Intro - what is classes as a brain tumour, explain difference between malignant/non-malignant
+        -   Looking at Scotland and it's health boards between 1994 and 2017
+        - Investigating how the incidence, survival and mortality differs between healthboards and across the time span
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+* Incidence has increased slightly across scotland but no huge changes
+* Incidence fairly consistent across health boards
+* Increase likely due to aging population, we can expect further increases as our population ages.
 
-```{r cars}
-summary(cars)
-```
+* 1 year survival has improved a touch
+* 5 year survival has not changed
+* 10 year survival not reliably reported...perhaps due to being very low
 
-## Including Plots
+* Difficulties - Main risk factors are age (fairly consitent across the country), family history (not available without individual patient records), obesity
+              -   A less common cancer compared to lung/bone/liver with a less obvious trigger (eg. smoking/alcohol) so low numbers means difficulty providing statistically significant survival data.
+              
+* 
 
-You can also embed plots, for example:
+* Next steps:
+  -   Data on different brain tumour classifications/ site/depth of tumour
+  -   Data on stage at presentation
+  -   Data on family history
+  -   Data on symptoms/impact on QoL, particularly in those who survived long term
+  -   Data stretching further back to see if introduction of MRI's increased reporting or survival rate
+  -   Monitor impact of New laser therapy
+  
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+
+
+
+

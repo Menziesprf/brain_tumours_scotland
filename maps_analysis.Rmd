@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r, warning=F, message=F}
 source("cleaning_exploration_script.R")
 
 library(sf)
@@ -18,17 +18,171 @@ library(rmapshaper)
 ```
 
 ```{r}
-library(tidyverse)
-library(sf)
-library(rgdal)
-library(rmapshaper)
+chunks <- readOGR(dsn = "data/SG_NHS_HealthBoards_2019", layer = "SG_NHS_HealthBoards_2019") %>% 
+  st_as_sf()
 
-chunks <- readOGR(dsn = "data/SG_NHS_HealthBoards_2019", layer = "SG_NHS_HealthBoards_2019")
-
-good_chunks <- st_as_sf(chunks)
-
-hb_borders <- ms_simplify(good_chunks) %>% 
+hb_borders <- ms_simplify(chunks) %>% 
   select(HBCode, HBName, geometry) %>% 
-  rename("feature_code" = "HBCode")
+  rename("Code" = "HBCode",
+         "hb" = "HBName") %>% 
+  mutate(hb = str_to_lower(hb))
+
 ```
+
+# Ages
+
+```{r}
+ages_map_data_2019 <- pop_2019_all_clean %>%
+  mutate(hb = str_to_lower(hb)) %>% 
+  left_join(hb_borders, by = "Code") %>% 
+  rename(hb = hb.x) %>% 
+  select(-hb.y)
+
+ages_map_data_2017 <- pop_2017_all_clean %>%
+  mutate(hb = str_to_lower(hb)) %>% 
+  left_join(hb_borders, by = "hb") 
+
+
+head(ages_map_data_2019)
+head(ages_map_data_2017)
+
+
+```
+
+```{r}
+ages_map_data_2019 %>% 
+  filter(over_65 == "over_65") %>% 
+  ggplot() +
+  geom_sf(aes(fill = percentage_pop, geometry = geometry)) +
+  scale_fill_steps(
+          n.breaks = 7,
+          high = "#132B43",
+          low = "#56B1F7",
+          space = "Lab",
+          na.value = "grey50",
+          guide = "coloursteps",
+          aesthetics = "fill",
+          labels = waiver(),
+          show.limits = T) +
+  scale_colour_manual(values = c("TRUE" = "#cca300", "FALSE" = NA)) +
+  guides(colour = FALSE) +
+  labs(fill = "Percent over 65",
+        x = NULL,
+        y = NULL,
+       title = "Percentage of Population over 65, 2019") +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        plot.title = element_text(size = 12))
+
+ages_map_data_2017 %>% 
+  filter(over_65 == "over_65") %>% 
+  ggplot() +
+  geom_sf(aes(fill = percentage_pop, geometry = geometry)) +
+  scale_fill_steps(
+          n.breaks = 7,
+          high = "#132B43",
+          low = "#56B1F7",
+          space = "Lab",
+          na.value = "grey50",
+          guide = "coloursteps",
+          aesthetics = "fill",
+          labels = waiver(),
+          show.limits = T) +
+  scale_colour_manual(values = c("TRUE" = "#cca300", "FALSE" = NA)) +
+  guides(colour = FALSE) +
+  labs(fill = "Percent over 65",
+        x = NULL,
+        y = NULL,
+       title = "Percentage of Population over 65, 2017") +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        plot.title = element_text(size = 12))
+```
+
+# Incidence 
+
+```{r}
+incidence_map <- incidence_map_prep %>% 
+  filter(value_type == "crude_rate") %>% 
+  left_join(hb_borders, by ="hb") %>% 
+  rename(code = Code.x) %>% 
+  select(-Code.y)
+
+names(incidence_map)
+
+head(incidence_map)
+
+unique(incidence_map$sex)
+```
+
+```{r}
+incidence_map %>% 
+  filter(year == 2017,
+         cancer_type == "all",
+         sex == "all") %>% 
+  ggplot() +
+  geom_sf(aes(fill = value, geometry = geometry)) +
+  scale_fill_steps(
+          n.breaks = 7,
+          high = "#132B43",
+          low = "#56B1F7",
+          space = "Lab",
+          na.value = "grey50",
+          guide = "coloursteps",
+          aesthetics = "fill",
+          labels = waiver(),
+          show.limits = T) +
+  scale_colour_manual(values = c("TRUE" = "#cca300", "FALSE" = NA)) +
+  guides(colour = FALSE) +
+  labs(fill = "Crude Rate",
+        x = NULL,
+        y = NULL,
+       title = "Incidence") +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        plot.title = element_text(size = 12))
+```
+
+* Some correlation between ages over 65 and incidence, but shows there are other factors. 
+
+
+
+```{r}
+incidence_map %>% 
+  filter(year == 2000,
+         cancer_type == "all",
+         sex == "all") %>% 
+  ggplot() +
+  geom_sf(aes(fill = value, geometry = geometry)) +
+  scale_fill_steps(
+          n.breaks = 7,
+          high = "#132B43",
+          low = "#56B1F7",
+          space = "Lab",
+          na.value = "grey50",
+          guide = "coloursteps",
+          aesthetics = "fill",
+          labels = waiver(),
+          show.limits = T) +
+  scale_colour_manual(values = c("TRUE" = "#cca300", "FALSE" = NA)) +
+  guides(colour = FALSE) +
+  labs(fill = "Crude Rate",
+        x = NULL,
+        y = NULL,
+       title = "Incidence") +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        plot.title = element_text(size = 12))
+```
+
+
+
+
+
+
+
 
