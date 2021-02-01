@@ -215,13 +215,239 @@ incidence_all_ages %>%
 
 ```{r}
 incidence_all_ages %>% 
-  filter(year == 2018,
+  filter(year == 1994,
          sex != "all",
          hb == "scotland",
          cancer_type %in% c("mal_brain", "non_mal_plus_glands"))
 ```
 
+```{r}
+incidence_all_ages %>%
+  drop_na() %>% 
+  filter(age == "all",
+         hb == "scotland",
+         cancer_type == "mal_brain") %>% 
+  ggplot() +
+  aes(x = year, y = incidence, colour = sex) +
+  geom_line() +
+  labs(title = "Scotland, malignant")
+
+incidence_all_ages %>%
+  drop_na() %>% 
+  filter(age == "all",
+         hb == "scotland",
+         cancer_type == "mal_brain") %>% 
+  ggplot() +
+  aes(x = year, y = num_cases, colour = sex) +
+  geom_line() +
+  labs(title = "Scotland, malignant")
+```
+
+* Increasing incidence associated with increasing population?
+
 # Mortality
+
+```{r}
+mort_ages %>% 
+  filter(hb == "scotland",
+         age == "all") %>% 
+  ggplot() +
+  aes(x = year, y = mortality_rate, colour = sex) +
+  geom_line() +
+  facet_wrap(~ cancer_type) +
+  labs(title = "Scotland, all ages")
+
+mort_ages %>% 
+  filter(hb == "scotland",
+         age == "all") %>% 
+  ggplot() +
+  aes(x = year, y = num_deaths, colour = sex) +
+  geom_line() +
+  facet_wrap(~ cancer_type) +
+  labs(title = "Scotland, all ages")
+```
+
+* Mortality rate is higher in males and increases from 1994 to 2018...is this just because incidence is higher or are people dying at higher rate once diagnosed?...need to review mortality rate definition
+
+
+
+# Survival rate
+
+```{r}
+survival_clean %>% 
+  filter(age_group == "15-99") %>% 
+  ggplot() +
+  aes(x = calendar_period_of_diagnosis, y = observed_survival_percent, fill = sex) +
+  geom_col() +
+  facet_wrap(~ years_since_diagnosis) +
+  labs(title = "age 15-99")
+
+survival_clean %>% 
+  filter(age_group == "15-99") %>% 
+  ggplot() +
+  aes(x = calendar_period_of_diagnosis, y = net_survival_percent, fill = sex) +
+  geom_col() +
+  facet_wrap(~ years_since_diagnosis) +
+  labs(title = "age 15-99")
+```
+
+* Increase in 1 year survival but no change in 5 year survival
+
+```{r}
+survival_clean %>% 
+  filter(age_group == "15-74",
+         years_since_diagnosis == "10") %>% 
+  ggplot() +
+  aes(x = calendar_period_of_diagnosis, y = observed_survival_percent, fill = sex) +
+  geom_col() +
+  labs(title = "age 15-74")
+
+survival_clean %>% 
+  filter(age_group == "15-74",
+         years_since_diagnosis == "10") %>% 
+  ggplot() +
+  aes(x = calendar_period_of_diagnosis, y = net_survival_percent, fill = sex) +
+  geom_col() +
+  labs(title = "age 15-74")
+```
+
+* 10 year survival for ages 15 - 74 has not changed much 
+
+
+```{r}
+survival_clean %>% 
+  filter(years_since_diagnosis == 10,
+         age_group == "15-74")
+```
+
+# Age
+
+```{r}
+pop_clean_94 <- pop_clean %>% 
+  filter(year == 1994) 
+
+pop_clean_04 <- pop_clean %>% 
+  filter(year == 2004)
+
+pop_clean_14 <- pop_clean %>% 
+  filter(year == 2014)
+
+pop_clean_19 <- pop_clean %>% 
+  filter(year == 2019)
+
+```
+
+
+* Aging population, so we can expect an increase in brain cancer incidence
+
+
+```{r}
+pop_clean_94 %>% 
+  ggplot() +
+  aes(x = ifelse(sex == "male", -count_group, count_group), 
+      y = age_group, 
+      fill = sex) +
+  geom_col() +
+  labs(x = "Population",
+       title = "1994") +
+  scale_x_continuous(n.breaks =  10)
+
+pop_clean_04 %>% 
+  ggplot() +
+  aes(x = ifelse(sex == "male", -count_group, count_group), 
+      y = age_group, 
+      fill = sex) +
+  geom_col() +
+  labs(x = "Population",
+       title = "2004") +
+  scale_x_continuous(n.breaks =  10)
+
+pop_clean_14 %>% 
+  ggplot() +
+  aes(x = ifelse(sex == "male", -count_group, count_group), 
+      y = age_group, 
+      fill = sex) +
+  geom_col() +
+  labs(x = "Population",
+       title = "2014") +
+  scale_x_continuous(n.breaks =  10)
+
+pop_clean_19 %>% 
+  ggplot() +
+  aes(x = ifelse(sex == "male", -count_group, count_group), 
+      y = age_group, 
+      fill = sex) +
+  geom_col() +
+  labs(x = "Population",
+       title = "2019") +
+  scale_x_continuous(n.breaks =  10) 
+
+pop_clean_94 %>% 
+  ggplot() +
+  aes(x = ifelse(sex == "male", -percentage_pop, percentage_pop), 
+      y = age_group, 
+      fill = sex) +
+  geom_col() +
+  labs(x = "Population",
+       title = "1994") +
+  scale_x_continuous(n.breaks =  10)
+
+pop_clean_04 %>% 
+  ggplot() +
+  aes(x = ifelse(sex == "male", -percentage_pop, percentage_pop), 
+      y = age_group, 
+      fill = sex) +
+  geom_col() +
+  labs(x = "Population",
+       title = "2004") +
+  scale_x_continuous(n.breaks =  10)
+
+pop_clean_14 %>% 
+  ggplot() +
+  aes(x = ifelse(sex == "male", -percentage_pop, percentage_pop), 
+      y = age_group, 
+      fill = sex) +
+  geom_col() +
+  labs(x = "Population",
+       title = "2014") +
+  scale_x_continuous(n.breaks =  10)
+
+pop_clean_19 %>% 
+  ggplot() +
+  aes(x = ifelse(sex == "male", -percentage_pop, percentage_pop), 
+      y = age_group, 
+      fill = sex) +
+  geom_col() +
+  labs(x = "Population",
+       title = "2019") +
+  scale_x_continuous(n.breaks =  10)
+
+
+```
+
+
+
+```{r}
+pop_2019_hb_clean %>% 
+  ggplot() +
+  aes(x = ifelse(sex == "male", -percentage_pop, percentage_pop), 
+      y = age_group, 
+      fill = sex) +
+  geom_col() +
+  labs(x = "Population") +
+  facet_wrap(~ hb)
+
+pop_2019_hb_clean %>% 
+  ggplot() +
+  aes(x = ifelse(sex == "male", -count_group, count_group), 
+      y = age_group, 
+      fill = sex) +
+  geom_col() +
+  labs(x = "Population") +
+  facet_wrap(~ hb)
+```
+
+* 
 
 
 

@@ -93,6 +93,7 @@ mortality_clean <- mal_cns_mort_data %>%
                names_to = "year",
                values_to = "values") %>% 
   mutate(year = str_replace(year, "trans1.", ""),
+         year = as.double(year),
          age_label = str_replace_all(age_label, 
                                      c("Number of deaths: " = "num_", 
                                        "Mortality rate: " = "mort_",
@@ -126,7 +127,9 @@ mort_ages <- mortality_clean %>%
                               T ~ "mortality_rate")) %>% 
   mutate(age = str_replace_all(age, c("num_" = "", "mort_" = ""))) %>% 
   pivot_wider(names_from = mort_flag, 
-              values_from = values)
+              values_from = values) %>% 
+  mutate(age = recode(age,
+                      "5.." = "05-09"))
 
 # 2B: STATS 
 
@@ -235,8 +238,8 @@ rm(deprivation_incidence_data, deprivation_incidence_clean,
 
 #excel_sheets("data/mal_cns_risk.xls")
 
-#risk_scotland <- read_xls("data/mal_cns_risk.xls", sheet = 1)
-#risk_data <- read_xls("data/mal_cns_risk.xls", sheet = 4)
+# risk_scotland <- read_xls("data/mal_cns_risk.xls", sheet = 1)
+# risk_data <- read_xls("data/mal_cns_risk.xls", sheet = 4)
 
 
 
@@ -292,7 +295,118 @@ prevalence_diagnosis_groups <- prevalence_clean %>%
 rm(prev_scotland, prev_data, prevalence_clean, age_groups_prev)
 
 
+# ---------- CENSUS ----------
+
+# years, all scotland
+
+pop_scotland_male <- read_csv("data/census/mid-year-pop-est-19-time-series-7_Population estimates 1981-2019.csv",
+                         skip = 44, col_names = TRUE, n_max = 39)
+
+pop_scotland_female <- read_csv("data/census/mid-year-pop-est-19-time-series-7_Population estimates 1981-2019.csv",
+                              skip = 86, col_names = TRUE, n_max = 39)
+
+# selecting years 1994, 2004, 2014, 2019
+
+years <- c(1994, 2004, 2014, 2019)
+
+pop_scotland_male_clean <- pop_scotland_male %>% 
+  rename(year = Males) %>% 
+  select(-"All Ages", -X94) %>% 
+  filter(year %in% years) %>% 
+  pivot_longer(cols = "0":"90+",
+               names_to = "age",
+               values_to = "count") %>% 
+  mutate(sex = "male")
+
+pop_scotland_female_clean <- pop_scotland_female %>% 
+  rename(year = Females) %>% 
+  select(-"All Ages", -X94) %>% 
+  filter(year %in% years) %>% 
+  pivot_longer(cols = "0":"90+",
+               names_to = "age",
+               values_to = "count") %>% 
+  mutate(sex = "female")
+
+groups <- c(paste(seq(0, 85, by = 5), seq(0 + 5 - 1, 90 - 1, by = 5),
+                sep = "-"), paste(90, "+", sep = ""))
+
+
+pop_clean <- pop_scotland_male_clean %>% 
+  bind_rows(pop_scotland_female_clean) %>% 
+  mutate(age = recode(age,
+                      "90+" = "90"),
+         age = as.numeric(age),
+         age_group = cut(age, 
+                         breaks = c(seq(0, 90, by = 5), Inf), 
+                         labels = groups, 
+                         right = FALSE),
+         age = as.character(age))  %>% 
+  group_by(age_group, sex, year) %>% 
+  mutate(count_group = sum(count)) %>% 
+  select(-age, -count) %>% 
+  distinct() %>%
+  ungroup() %>% 
+  group_by(sex, year) %>% 
+  mutate(total_pop = sum(count_group)) %>% 
+  group_by(age_group) %>% 
+  mutate(percentage_pop = (count_group/total_pop*100))
+
+rm(pop_scotland_female, pop_scotland_female_clean, pop_scotland_male, 
+   pop_scotland_male_clean, years)
+
+# 2019, healthboards
+
+pop_2019_male <- read_csv("data/census/mid-year-pop-est-19-time-series-3/mid-year-pop-est-19-time-series-3_2019.csv",
+                     skip = 21, col_names = TRUE, n_max = 17)
+
+pop_2019_female <- read_csv("data/census/mid-year-pop-est-19-time-series-3/mid-year-pop-est-19-time-series-3_2019.csv",
+                            skip = 40, col_names = TRUE, n_max = 17)
+
+pop_2019_male_clean <- pop_2019_male %>% 
+  drop_na() %>% 
+  rename(hb = Males) %>% 
+  select(-Code, -"All Ages") %>% 
+  filter(hb != "Scotland") %>% 
+  pivot_longer(cols = "0":"90+",
+               names_to = "age",
+               values_to = "count") %>% 
+  mutate(sex = "male")
+
+pop_2019_female_clean <- pop_2019_female %>% 
+  drop_na() %>% 
+  rename(hb = Females) %>% 
+  select(-Code, -"All Ages") %>% 
+  filter(hb != "Scotland") %>% 
+  pivot_longer(cols = "0":"90+",
+               names_to = "age",
+               values_to = "count") %>% 
+  mutate(sex = "female")
+
+pop_2019_hb_clean <- pop_2019_female_clean %>% 
+  bind_rows(pop_2019_male_clean) %>% 
+  mutate(age = recode(age,
+                      "90+" = "90"),
+         age = as.numeric(age),
+         age_group = cut(age, 
+                         breaks = c(seq(0, 90, by = 5), Inf), 
+                         labels = groups, 
+                         right = FALSE),
+         age = as.character(age)) %>% 
+  group_by(age_group, sex, hb) %>% 
+  mutate(count_group = sum(count)) %>% 
+  select(-age, -count) %>% 
+  distinct() %>%
+  ungroup() %>% 
+  group_by(sex, hb) %>% 
+  mutate(total_pop = sum(count_group)) %>% 
+  group_by(age_group) %>% 
+  mutate(percentage_pop = (count_group/total_pop*100))
+
+rm(pop_2019_female, pop_2019_female_clean, pop_2019_male, 
+   pop_2019_male_clean, groups)
+
+
 # ------------- END ---------------
 
-
+# midyear pop estimates from "national records of scotland" 
 
