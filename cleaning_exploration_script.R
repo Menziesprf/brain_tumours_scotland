@@ -362,6 +362,9 @@ pop_2019_male <- read_csv("data/census/mid-year-pop-est-19-time-series-3/mid-yea
 pop_2019_female <- read_csv("data/census/mid-year-pop-est-19-time-series-3/mid-year-pop-est-19-time-series-3_2019.csv",
                             skip = 40, col_names = TRUE, n_max = 17)
 
+pop_2019_all <- read_csv("data/census/mid-year-pop-est-19-time-series-3/mid-year-pop-est-19-time-series-3_2019.csv",
+                         skip = 2, col_names = TRUE, n_max = 17)
+
 pop_2019_male_clean <- pop_2019_male %>% 
   drop_na() %>% 
   rename(hb = Males) %>% 
@@ -402,8 +405,31 @@ pop_2019_hb_clean <- pop_2019_female_clean %>%
   group_by(age_group) %>% 
   mutate(percentage_pop = (count_group/total_pop*100))
 
+pop_2019_all_clean <- pop_2019_all %>% 
+  drop_na() %>% 
+  rename(hb = Persons) %>% 
+  select(-"All Ages") %>% 
+  filter(hb != "Scotland") %>% 
+  pivot_longer(cols = "0":"90+",
+               names_to = "age",
+               values_to = "count") %>% 
+  mutate(age = recode(age,
+                      "90+" = "90"),
+         age = as.numeric(age),
+         over_65 = case_when(age < 65 ~ "under_65",
+                             T ~ "over_65")) %>% 
+  group_by(over_65, hb) %>% 
+  mutate(count_over_65 = sum(count)) %>%
+  select(-age, -count) %>% 
+  distinct() %>%
+  ungroup() %>% 
+  group_by(hb) %>% 
+  mutate(total_pop = sum(count_over_65)) %>% 
+  group_by(over_65) %>% 
+  mutate(percentage_pop = (count_over_65/total_pop*100))
+
 rm(pop_2019_female, pop_2019_female_clean, pop_2019_male, 
-   pop_2019_male_clean, groups)
+   pop_2019_male_clean, groups, pop_2019_all)
 
 
 # ------------- END ---------------

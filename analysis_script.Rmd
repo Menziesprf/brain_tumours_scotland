@@ -201,6 +201,30 @@ incidence_all_ages %>%
   geom_line() +
   facet_wrap(~ age)+
   labs(title = "Scotland, non_mal")
+
+incidence_all_ages %>%
+  drop_na() %>% 
+  filter(age != "all",
+         hb == "scotland",
+         cancer_type == "all") %>% 
+  ggplot() +
+  aes(x = year, y = incidence, colour = sex) +
+  geom_line() +
+  facet_wrap(~ age)+
+  labs(title = "Scotland, all")
+
+incidence_all_ages %>%
+  drop_na() %>% 
+  filter(age != "all",
+         hb == "scotland",
+         cancer_type == "all") %>% 
+  ggplot() +
+  aes(x = year, y = num_cases, colour = sex) +
+  geom_line() +
+  facet_wrap(~ age)+
+  labs(title = "Scotland, all")
+
+
 ```
 
 * Malignant tumours:
@@ -449,7 +473,34 @@ pop_2019_hb_clean %>%
 
 * 
 
+```{r}
+over <- c("65-69", "70-74", "75-79", "80-84", "85-89", "90+")
 
+pop_hb_2019_grouped <- pop_2019_hb_clean %>% 
+  mutate(over_65 = case_when(age_group %in% over ~ "over_65",
+                             T ~ "under_65")) %>% 
+  group_by(sex, hb, over_65) %>% 
+  mutate(percent_over_65 = sum(percentage_pop)) %>% 
+  select(-age_group, -total_pop, -count_group, -percentage_pop) %>% 
+  distinct()
+
+pop_hb_2019_grouped %>% 
+  filter(sex == "male") %>% 
+  ggplot() + 
+  aes(x = over_65, y = percent_over_65) +
+  geom_col() +
+  facet_wrap(~ hb)
+```
+
+* using both male and female ->
+
+```{r}
+pop_2019_all_clean %>% 
+  ggplot() +
+  aes(x = over_65, y = percentage_pop) +
+  geom_col() +
+  facet_wrap(~ hb)
+```
 
 
 

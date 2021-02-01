@@ -1,0 +1,34 @@
+---
+title: "maps"
+author: "Peter Menzies"
+date: "01/02/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+source("cleaning_exploration_script.R")
+
+library(sf)
+library(rgdal)
+library(rmapshaper)
+```
+
+```{r}
+library(tidyverse)
+library(sf)
+library(rgdal)
+library(rmapshaper)
+
+chunks <- readOGR(dsn = "data/SG_NHS_HealthBoards_2019", layer = "SG_NHS_HealthBoards_2019")
+
+good_chunks <- st_as_sf(chunks)
+
+hb_borders <- ms_simplify(good_chunks) %>% 
+  select(HBCode, HBName, geometry) %>% 
+  rename("feature_code" = "HBCode")
+```
+
