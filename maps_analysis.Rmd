@@ -248,295 +248,108 @@ incidence_map %>%
         panel.background = element_blank(),
         plot.title = element_text(size = 12))
 
-incidence_map %>% 
-  filter(year == 2009,
-         cancer_type == "mal_brain",
-         sex == "all") %>% 
-  ggplot() +
-  geom_sf(aes(fill = value, geometry = geometry)) +
-  scale_fill_steps(
-          n.breaks = 7,
-          high = "#132B43",
-          low = "#56B1F7",
-          space = "Lab",
-          na.value = "grey50",
-          guide = "coloursteps",
-          aesthetics = "fill",
-          labels = waiver(),
-          show.limits = T) +
-  scale_colour_manual(values = c("TRUE" = "#cca300", "FALSE" = NA)) +
-  guides(colour = FALSE) +
-  labs(fill = "Crude Rate",
-        x = NULL,
-        y = NULL,
-       title = "Incidence, Malignant, 2009") +
-  theme(axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        plot.title = element_text(size = 12))
-
-incidence_map %>% 
-  filter(year == 2010,
-         cancer_type == "mal_brain",
-         sex == "all") %>% 
-  ggplot() +
-  geom_sf(aes(fill = value, geometry = geometry)) +
-  scale_fill_steps(
-          n.breaks = 7,
-          high = "#132B43",
-          low = "#56B1F7",
-          space = "Lab",
-          na.value = "grey50",
-          guide = "coloursteps",
-          aesthetics = "fill",
-          labels = waiver(),
-          show.limits = T) +
-  scale_colour_manual(values = c("TRUE" = "#cca300", "FALSE" = NA)) +
-  guides(colour = FALSE) +
-  labs(fill = "Crude Rate",
-        x = NULL,
-        y = NULL,
-       title = "Incidence, Malignant, 2010") +
-  theme(axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        plot.title = element_text(size = 12))
-
-incidence_map %>% 
-  filter(year == 2011,
-         cancer_type == "mal_brain",
-         sex == "all") %>% 
-  ggplot() +
-  geom_sf(aes(fill = value, geometry = geometry)) +
-  scale_fill_steps(
-          n.breaks = 7,
-          high = "#132B43",
-          low = "#56B1F7",
-          space = "Lab",
-          na.value = "grey50",
-          guide = "coloursteps",
-          aesthetics = "fill",
-          labels = waiver(),
-          show.limits = T) +
-  scale_colour_manual(values = c("TRUE" = "#cca300", "FALSE" = NA)) +
-  guides(colour = FALSE) +
-  labs(fill = "Crude Rate",
-        x = NULL,
-        y = NULL,
-       title = "Incidence, Malignant, 2011") +
-  theme(axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        plot.title = element_text(size = 12))
-
-incidence_map %>% 
-  filter(year == 2012,
-         cancer_type == "mal_brain",
-         sex == "all") %>% 
-  ggplot() +
-  geom_sf(aes(fill = value, geometry = geometry)) +
-  scale_fill_steps(
-          n.breaks = 7,
-          high = "#132B43",
-          low = "#56B1F7",
-          space = "Lab",
-          na.value = "grey50",
-          guide = "coloursteps",
-          aesthetics = "fill",
-          labels = waiver(),
-          show.limits = T) +
-  scale_colour_manual(values = c("TRUE" = "#cca300", "FALSE" = NA)) +
-  guides(colour = FALSE) +
-  labs(fill = "Crude Rate",
-        x = NULL,
-        y = NULL,
-       title = "Incidence, Malignant, 2012") +
-  theme(axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        plot.title = element_text(size = 12))
-
-incidence_map %>% 
-  filter(year == 2013,
-         cancer_type == "mal_brain",
-         sex == "all") %>% 
-  ggplot() +
-  geom_sf(aes(fill = value, geometry = geometry)) +
-  scale_fill_steps(
-          n.breaks = 7,
-          high = "#132B43",
-          low = "#56B1F7",
-          space = "Lab",
-          na.value = "grey50",
-          guide = "coloursteps",
-          aesthetics = "fill",
-          labels = waiver(),
-          show.limits = T) +
-  scale_colour_manual(values = c("TRUE" = "#cca300", "FALSE" = NA)) +
-  guides(colour = FALSE) +
-  labs(fill = "Crude Rate",
-        x = NULL,
-        y = NULL,
-       title = "Incidence, Malignant, 2013") +
-  theme(axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        plot.title = element_text(size = 12))
-
-incidence_map %>% 
-  filter(year == 2014,
-         cancer_type == "mal_brain",
-         sex == "all") %>% 
-  ggplot() +
-  geom_sf(aes(fill = value, geometry = geometry)) +
-  scale_fill_steps(
-          n.breaks = 7,
-          high = "#132B43",
-          low = "#56B1F7",
-          space = "Lab",
-          na.value = "grey50",
-          guide = "coloursteps",
-          aesthetics = "fill",
-          labels = waiver(),
-          show.limits = T) +
-  scale_colour_manual(values = c("TRUE" = "#cca300", "FALSE" = NA)) +
-  guides(colour = FALSE) +
-  labs(fill = "Crude Rate",
-        x = NULL,
-        y = NULL,
-       title = "Incidence, Malignant, 2014") +
-  theme(axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        plot.title = element_text(size = 12))
-
-incidence_map %>% 
-  filter(year == 2015,
-         cancer_type == "mal_brain",
-         sex == "all") %>% 
-  ggplot() +
-  geom_sf(aes(fill = value, geometry = geometry)) +
-  scale_fill_steps(
-          n.breaks = 7,
-          high = "#132B43",
-          low = "#56B1F7",
-          space = "Lab",
-          na.value = "grey50",
-          guide = "coloursteps",
-          aesthetics = "fill",
-          labels = waiver(),
-          show.limits = T) +
-  scale_colour_manual(values = c("TRUE" = "#cca300", "FALSE" = NA)) +
-  guides(colour = FALSE) +
-  labs(fill = "Crude Rate",
-        x = NULL,
-        y = NULL,
-       title = "Incidence, Malignant, 2015") +
-  theme(axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        plot.title = element_text(size = 12))
-
-incidence_map %>% 
-  filter(year == 2016,
-         cancer_type == "mal_brain",
-         sex == "all") %>% 
-  ggplot() +
-  geom_sf(aes(fill = value, geometry = geometry)) +
-  scale_fill_steps(
-          n.breaks = 7,
-          high = "#132B43",
-          low = "#56B1F7",
-          space = "Lab",
-          na.value = "grey50",
-          guide = "coloursteps",
-          aesthetics = "fill",
-          labels = waiver(),
-          show.limits = T) +
-  scale_colour_manual(values = c("TRUE" = "#cca300", "FALSE" = NA)) +
-  guides(colour = FALSE) +
-  labs(fill = "Crude Rate",
-        x = NULL,
-        y = NULL,
-       title = "Incidence, Malignant, 2016") +
-  theme(axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        plot.title = element_text(size = 12))
-
-incidence_map %>% 
-  filter(year == 2017,
-         cancer_type == "mal_brain",
-         sex == "all") %>% 
-  ggplot() +
-  geom_sf(aes(fill = value, geometry = geometry)) +
-  scale_fill_steps(
-          n.breaks = 7,
-          high = "#132B43",
-          low = "#56B1F7",
-          space = "Lab",
-          na.value = "grey50",
-          guide = "coloursteps",
-          aesthetics = "fill",
-          labels = waiver(),
-          show.limits = T) +
-  scale_colour_manual(values = c("TRUE" = "#cca300", "FALSE" = NA)) +
-  guides(colour = FALSE) +
-  labs(fill = "Crude Rate",
-        x = NULL,
-        y = NULL,
-       title = "Incidence, Malignant, 2017") +
-  theme(axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        plot.title = element_text(size = 12))
-
-incidence_map %>% 
-  filter(year == 2018,
-         cancer_type == "mal_brain",
-         sex == "all") %>% 
-  ggplot() +
-  geom_sf(aes(fill = value, geometry = geometry)) +
-  scale_fill_steps(
-          n.breaks = 7,
-          high = "#132B43",
-          low = "#56B1F7",
-          space = "Lab",
-          na.value = "grey50",
-          guide = "coloursteps",
-          aesthetics = "fill",
-          labels = waiver(),
-          show.limits = T) +
-  scale_colour_manual(values = c("TRUE" = "#cca300", "FALSE" = NA)) +
-  guides(colour = FALSE) +
-  labs(fill = "Crude Rate",
-        x = NULL,
-        y = NULL,
-       title = "Incidence, Malignant, 2018") +
-  theme(axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        panel.background = element_blank(),
-        plot.title = element_text(size = 12))
 ```
 
+
+
+```{r}
+# incidence_map %>% 
+#   filter(year == 1994,
+#          cancer_type == "mal_brain_plus_glands",
+#          sex == "all") %>% 
+#   ggplot() +
+#   geom_sf(aes(fill = value, geometry = geometry)) +
+#   scale_fill_distiller(
+#           limits = c(5, 11),
+#           palette = "YlOrRd",
+#           direction = 1) +
+#   guides(colour = FALSE) +
+#   labs(fill = "Crude Rate",
+#         x = NULL,
+#         y = NULL,
+#        title = "Incidence, region, Malignant plus glands, 1994") +
+#   theme(axis.text = element_blank(),
+#         axis.ticks = element_blank(),
+#         panel.background = element_blank(),
+#         plot.title = element_text(size = 12))
+# 
+# 
+# incidence_map %>% 
+#   filter(year == 2004,
+#          cancer_type == "mal_brain_plus_glands",
+#          sex == "all") %>% 
+#   ggplot() +
+#   geom_sf(aes(fill = value, geometry = geometry)) +
+#   scale_fill_distiller(
+#           limits = c(5, 11),
+#           palette = "YlOrRd",
+#           direction = 1) +
+#   guides(colour = FALSE) +
+#   labs(fill = "Crude Rate",
+#         x = NULL,
+#         y = NULL,
+#        title = "Incidence, region, Malignant plus glands, 2004") +
+#   theme(axis.text = element_blank(),
+#         axis.ticks = element_blank(),
+#         panel.background = element_blank(),
+#         plot.title = element_text(size = 12))
+# 
+# incidence_map %>% 
+#   filter(year == 2014,
+#          cancer_type == "mal_brain_plus_glands",
+#          sex == "all") %>% 
+#   ggplot() +
+#   geom_sf(aes(fill = value, geometry = geometry)) +
+#   scale_fill_distiller(
+#           limits = c(5, 11),
+#           palette = "YlOrRd",
+#           direction = 1) +
+#   guides(colour = FALSE) +
+#   labs(fill = "Crude Rate",
+#         x = NULL,
+#         y = NULL,
+#        title = "Incidence, region, Malignant plus glands, 2014") +
+#   theme(axis.text = element_blank(),
+#         axis.ticks = element_blank(),
+#         panel.background = element_blank(),
+#         plot.title = element_text(size = 12))
+# 
+# 
+# incidence_map %>% 
+#   filter(year == 2018,
+#          cancer_type == "mal_brain_plus_glands",
+#          sex == "all") %>% 
+#   ggplot() +
+#   geom_sf(aes(fill = value, geometry = geometry)) +
+#   scale_fill_distiller(
+#           limits = c(5, 11),
+#           palette = "YlOrRd",
+#           direction = 1) +
+#   guides(colour = FALSE) +
+#   labs(fill = "Crude Rate",
+#         x = NULL,
+#         y = NULL,
+#        title = "Incidence, region, Malignant plus glands, 2018") +
+#   theme(axis.text = element_blank(),
+#         axis.ticks = element_blank(),
+#         panel.background = element_blank(),
+#         plot.title = element_text(size = 12))
+```
+
+```{r}
+min(incidence_region_map$inc_region)
+max(incidence_region_map$inc_region)
+```
 
 ```{r}
 incidence_region_map %>% 
   filter(year == 1994) %>% 
   ggplot() +
   geom_sf(aes(fill = inc_region, geometry = geometry)) +
-  scale_fill_steps(
+  scale_fill_distiller(
           limits = c(5, 11),
-          n.breaks = 6,
-          high = "#132B43",
-          low = "#56B1F7",
-          space = "Lab",
-          na.value = "grey50",
-          guide = "coloursteps",
-          aesthetics = "fill",
-          labels = waiver(),
-          show.limits = T) +
-  scale_colour_manual(values = c("TRUE" = "#cca300", "FALSE" = NA)) +
+          palette = "YlOrRd",
+          direction = 1) +
   guides(colour = FALSE) +
   labs(fill = "Crude Rate",
         x = NULL,
@@ -548,21 +361,104 @@ incidence_region_map %>%
         plot.title = element_text(size = 12))
 
 incidence_region_map %>% 
+  filter(year == 1995) %>% 
+  ggplot() +
+  geom_sf(aes(fill = inc_region, geometry = geometry)) +
+  scale_fill_distiller(
+          limits = c(5, 11),
+          palette = "YlOrRd",
+          direction = 1) +
+  guides(colour = FALSE) +
+  labs(fill = "Crude Rate",
+        x = NULL,
+        y = NULL,
+       title = "Incidence, region, Malignant plus glands, 1995") +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        plot.title = element_text(size = 12))
+
+incidence_region_map %>% 
+  filter(year == 1996) %>% 
+  ggplot() +
+  geom_sf(aes(fill = inc_region, geometry = geometry)) +
+  scale_fill_distiller(
+          limits = c(5, 11),
+          palette = "YlOrRd",
+          direction = 1) +
+  guides(colour = FALSE) +
+  labs(fill = "Crude Rate",
+        x = NULL,
+        y = NULL,
+       title = "Incidence, region, Malignant plus glands, 1996") +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        plot.title = element_text(size = 12))
+
+incidence_region_map %>% 
+  filter(year == 1997) %>% 
+  ggplot() +
+  geom_sf(aes(fill = inc_region, geometry = geometry)) +
+  scale_fill_distiller(
+          limits = c(5, 11),
+          palette = "YlOrRd",
+          direction = 1) +
+  guides(colour = FALSE) +
+  labs(fill = "Crude Rate",
+        x = NULL,
+        y = NULL,
+       title = "Incidence, region, Malignant plus glands, 1997") +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        plot.title = element_text(size = 12))
+
+incidence_region_map %>% 
+  filter(year == 1998) %>% 
+  ggplot() +
+  geom_sf(aes(fill = inc_region, geometry = geometry)) +
+  scale_fill_distiller(
+          limits = c(5, 11),
+          palette = "YlOrRd",
+          direction = 1) +
+  guides(colour = FALSE) +
+  labs(fill = "Crude Rate",
+        x = NULL,
+        y = NULL,
+       title = "Incidence, region, Malignant plus glands, 1998") +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        plot.title = element_text(size = 12))
+
+incidence_region_map %>% 
+  filter(year == 1994) %>% 
+  ggplot() +
+  geom_sf(aes(fill = inc_region, geometry = geometry)) +
+  scale_fill_distiller(
+          limits = c(5, 11),
+          palette = "YlOrRd",
+          direction = 1) +
+  guides(colour = FALSE) +
+  labs(fill = "Crude Rate",
+        x = NULL,
+        y = NULL,
+       title = "Incidence, region, Malignant plus glands, 1994") +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        plot.title = element_text(size = 12))
+
+
+incidence_region_map %>% 
   filter(year == 2004) %>% 
   ggplot() +
   geom_sf(aes(fill = inc_region, geometry = geometry)) +
-  scale_fill_steps(
+  scale_fill_distiller(
           limits = c(5, 11),
-          n.breaks = 6,
-          high = "#132B43",
-          low = "#56B1F7",
-          space = "Lab",
-          na.value = "grey50",
-          guide = "coloursteps",
-          aesthetics = "fill",
-          labels = waiver(),
-          show.limits = T) +
-  scale_colour_manual(values = c("TRUE" = "#cca300", "FALSE" = NA)) +
+          palette = "YlOrRd",
+          direction = 1) +
   guides(colour = FALSE) +
   labs(fill = "Crude Rate",
         x = NULL,
@@ -574,21 +470,32 @@ incidence_region_map %>%
         plot.title = element_text(size = 12))
 
 incidence_region_map %>% 
+  filter(year == 2014) %>% 
+  ggplot() +
+  geom_sf(aes(fill = inc_region, geometry = geometry)) +
+  scale_fill_distiller(
+          limits = c(5, 11),
+          palette = "YlOrRd",
+          direction = 1) +
+  guides(colour = FALSE) +
+  labs(fill = "Crude Rate",
+        x = NULL,
+        y = NULL,
+       title = "Incidence, region, Malignant plus glands, 2014") +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.background = element_blank(),
+        plot.title = element_text(size = 12))
+
+
+incidence_region_map %>% 
   filter(year == 2018) %>% 
   ggplot() +
   geom_sf(aes(fill = inc_region, geometry = geometry)) +
-  scale_fill_steps(
+  scale_fill_distiller(
           limits = c(5, 11),
-          n.breaks = 10,
-          high = "#132B43",
-          low = "#56B1F7",
-          space = "Lab",
-          na.value = "grey50",
-          guide = "coloursteps",
-          aesthetics = "fill",
-          labels = waiver(),
-          show.limits = T) +
-  #scale_colour_manual(values = c("TRUE" = "#cca300", "FALSE" = NA)) +
+          palette = "YlOrRd",
+          direction = 1) +
   guides(colour = FALSE) +
   labs(fill = "Crude Rate",
         x = NULL,
@@ -599,9 +506,5 @@ incidence_region_map %>%
         panel.background = element_blank(),
         plot.title = element_text(size = 12))
 ```
-
-
-
-
 
 

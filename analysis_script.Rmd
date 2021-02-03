@@ -66,6 +66,19 @@ incidence_all_ages %>%
   facet_wrap(~ hb) +
   labs(title = "Malignant tumours") +
   theme_minimal()
+
+incidence_all_ages %>% 
+  drop_na() %>% 
+  filter(sex == "all",
+         cancer_type == "mal_brain_plus_glands",
+         age == "all",
+         hb != "scotland",
+         str_detect(hb, "scotland")) %>% 
+  ggplot() +
+  aes(x = year, y = incidence, colour = hb) +
+  geom_line() +
+  labs(title = "Malignant tumours") +
+  theme_minimal()
 ```
 
 * Big fluctuations in Incidence in Orkney, shetland, western isles and borders due to small population
@@ -108,14 +121,24 @@ incidence_all_ages %>%
   filter(hb == "scotland",
          sex == "all",
          age == "all",
-         cancer_type == "mal_brain")
+         cancer_type == "mal_brain_plus_glands")
+
+incidence_all_ages %>% 
+  filter(hb == "scotland",
+         sex == "all",
+         age == "all",
+         cancer_type == "non_mal_plus_glands")
 ```
 
-* 357 Malignant brain tumours in 1994, 17 pituitary gland, craniopharyngeal duct and pineal gland tumours. Incidence 7 per 100k 
+* 357 Malignant brain tumours in 1994, 17 pituitary gland, craniopharyngeal duct and pineal gland tumours. Incidence 7 per 100k. 1.02 per day
 
-* 451 Malignant brain tumours in 2018, 19 pituitary gland, craniopharyngeal duct and pineal gland tumours, 496 non-malignant brain tumours. 8.3 per 100k 
+* 451 Malignant brain tumours in 2018, 19 pituitary gland, craniopharyngeal duct and pineal gland tumours, 496 non-malignant brain tumours. 8.3 per 100k. 1.3 per day
+
+* In 1994 1 person per day with a malignant tu
 
 * In 2018 1.2 people were diagnosed per day with a malignant brain tumour
+
+
 
 
 
@@ -141,6 +164,26 @@ incidence_all_ages %>%
   geom_line() +
   facet_wrap(~ cancer_type)+
   labs(title = "Scotland")
+
+incidence_all_ages %>%
+  drop_na() %>% 
+  filter(sex == "all",
+         age == "all",
+         hb == "scotland",
+         cancer_type == "mal_brain_plus_glands") %>% 
+  ggplot() +
+  aes(x = year, y = incidence) +
+  geom_line(colour = "#FF5722", size = 2) +
+  ylim(6.5, 9) +
+  labs(title = "Incidence of Malignant Brain Cancer in Scotland",
+       x = "Year",
+       y = "Incidence") +
+  scale_x_continuous(breaks = c(1994, 1998, 2002, 2008, 2012, 2016, 2018)) +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 14, face = "bold"),
+        panel.grid.minor.x =  element_blank())
 ```
 
 * Increase in cases and incidence across Scotland between 1994 and 2018. Peaked at 2013.
@@ -686,85 +729,115 @@ pop_clean_19 <- pop_clean %>%
 
 
 ```{r}
-pop_clean_94 %>% 
-  ggplot() +
-  aes(x = ifelse(sex == "male", -count_group, count_group), 
-      y = age_group, 
-      fill = sex) +
-  geom_col() +
-  labs(x = "Population",
-       title = "1994") +
-  scale_x_continuous(n.breaks =  10)
-
-pop_clean_04 %>% 
-  ggplot() +
-  aes(x = ifelse(sex == "male", -count_group, count_group), 
-      y = age_group, 
-      fill = sex) +
-  geom_col() +
-  labs(x = "Population",
-       title = "2004") +
-  scale_x_continuous(n.breaks =  10)
-
-pop_clean_14 %>% 
-  ggplot() +
-  aes(x = ifelse(sex == "male", -count_group, count_group), 
-      y = age_group, 
-      fill = sex) +
-  geom_col() +
-  labs(x = "Population",
-       title = "2014") +
-  scale_x_continuous(n.breaks =  10)
-
-pop_clean_19 %>% 
-  ggplot() +
-  aes(x = ifelse(sex == "male", -count_group, count_group), 
-      y = age_group, 
-      fill = sex) +
-  geom_col() +
-  labs(x = "Population",
-       title = "2019") +
-  scale_x_continuous(n.breaks =  10) 
+options(scipen = 999)
 
 pop_clean_94 %>% 
   ggplot() +
-  aes(x = ifelse(sex == "male", -percentage_pop, percentage_pop), 
+  aes(x = ifelse(sex == "female", -count_group, count_group), 
       y = age_group, 
       fill = sex) +
   geom_col() +
+  scale_fill_manual(values = c("female" = "#FF5722", "male" = "#132B43")) +
   labs(x = "Population",
+       y = "Age Group",
        title = "1994") +
-  scale_x_continuous(n.breaks =  10)
+  scale_x_continuous(breaks = seq(-200000, 200000, 50000), labels = abs(seq(-200000, 200000, 50000))) +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 18, hjust = 0.5, face = "bold"),
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 14, face = "bold"),
+        panel.grid.minor.x =  element_blank())
 
 pop_clean_04 %>% 
   ggplot() +
-  aes(x = ifelse(sex == "male", -percentage_pop, percentage_pop), 
+  aes(x = ifelse(sex == "female", -count_group, count_group), 
       y = age_group, 
       fill = sex) +
   geom_col() +
+  scale_fill_manual(values = c("female" = "#FF5722", "male" = "#132B43")) +
   labs(x = "Population",
+       y = "Age Group",
        title = "2004") +
-  scale_x_continuous(n.breaks =  10)
+  scale_x_continuous(breaks = seq(-200000, 200000, 50000), labels = abs(seq(-200000, 200000, 50000))) +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 18, hjust = 0.5, face = "bold"),
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 14, face = "bold"),
+        panel.grid.minor.x =  element_blank())
 
 pop_clean_14 %>% 
   ggplot() +
-  aes(x = ifelse(sex == "male", -percentage_pop, percentage_pop), 
+  aes(x = ifelse(sex == "female", -count_group, count_group), 
       y = age_group, 
       fill = sex) +
   geom_col() +
+  scale_fill_manual(values = c("female" = "#FF5722", "male" = "#132B43")) +
   labs(x = "Population",
+       y = "Age Group",
        title = "2014") +
-  scale_x_continuous(n.breaks =  10)
+  scale_x_continuous(breaks = seq(-200000, 200000, 50000), labels = abs(seq(-200000, 200000, 50000))) +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 18, hjust = 0.5, face = "bold"),
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 14, face = "bold"),
+        panel.grid.minor.x =  element_blank())
 
 pop_clean_19 %>% 
   ggplot() +
-  aes(x = ifelse(sex == "male", -percentage_pop, percentage_pop), 
+  aes(x = ifelse(sex == "female", -count_group, count_group), 
       y = age_group, 
       fill = sex) +
   geom_col() +
+  scale_fill_manual(values = c("female" = "#FF5722", "male" = "#132B43")) +
   labs(x = "Population",
+       y = "Age Group",
        title = "2019") +
-  scale_x_continuous(n.breaks =  10)
+  scale_x_continuous(breaks = seq(-200000, 200000, 50000), labels = abs(seq(-200000, 200000, 50000))) +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 18, hjust = 0.5, face = "bold"),
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 14, face = "bold"),
+        panel.grid.minor.x =  element_blank())
+
+# pop_clean_94 %>% 
+#   ggplot() +
+#   aes(x = ifelse(sex == "male", -percentage_pop, percentage_pop), 
+#       y = age_group, 
+#       fill = sex) +
+#   geom_col() +
+#   labs(x = "Population",
+#        title = "1994") +
+#   scale_x_continuous(n.breaks =  10)
+# 
+# pop_clean_04 %>% 
+#   ggplot() +
+#   aes(x = ifelse(sex == "male", -percentage_pop, percentage_pop), 
+#       y = age_group, 
+#       fill = sex) +
+#   geom_col() +
+#   labs(x = "Population",
+#        title = "2004") +
+#   scale_x_continuous(n.breaks =  10)
+# 
+# pop_clean_14 %>% 
+#   ggplot() +
+#   aes(x = ifelse(sex == "male", -percentage_pop, percentage_pop), 
+#       y = age_group, 
+#       fill = sex) +
+#   geom_col() +
+#   labs(x = "Population",
+#        title = "2014") +
+#   scale_x_continuous(n.breaks =  10)
+# 
+# pop_clean_19 %>% 
+#   ggplot() +
+#   aes(x = ifelse(sex == "male", -percentage_pop, percentage_pop), 
+#       y = age_group, 
+#       fill = sex) +
+#   geom_col() +
+#   labs(x = "Population",
+#        title = "2019") +
+#   scale_x_continuous(n.breaks =  10)
 
 
 ```
@@ -843,13 +916,9 @@ incidence_all_ages %>%
          sex == "all") %>% 
   ggplot() +
   aes(x = age, y = incidence, colour = year) +
-  geom_point() 
+  geom_smooth() 
 ```
 
-
-```{r}
-
-```
 
 ```{r}
 model_set <- incidence_all_ages %>% 
@@ -860,18 +929,50 @@ model_set <- incidence_all_ages %>%
   drop_na() %>% 
   mutate(age = str_extract(age, "[0-9]+[-+]"),
          age = str_remove_all(age, "[-+]"),
-         age = as.numeric(age)) 
+         age = as.numeric(age))
 
-model_obj <- lm(incidence ~ poly(age,2), data=model_set)
+model_set_middle_value <- incidence_all_ages %>% 
+  filter(hb == "scotland",
+         cancer_type == "all",
+         sex == "all",
+         age != "all") %>%
+  drop_na() %>% 
+  mutate(age = str_extract(age, "[0-9]+[-+]"),
+         age = str_remove_all(age, "[-+]"),
+         age = as.numeric(age),
+         age = age + 2)
+
+model_obj_2 <- lm(incidence ~ poly(age,2), data=model_set)
 
 model_obj_3 <- lm(incidence ~ poly(age,3), data=model_set)
-summary(model_obj)
+
+model_obj_3_middle <- lm(incidence ~ poly(age,3), data=model_set_middle_value)
+
+summary(model_obj_2)
 
 summary(model_obj_3)
-```
-* Pretty sketchy and probably isn't statistically significant as the data is binned but perhaps shows that if the full data was available that a significant positive correlation is present. 
 
-* wots the point of including this?
+summary(model_obj_3_middle)
+```
+* Not ideal using the binned age data but unavoidable 
+
+* The p values are all significant in the cubed model, so I think it is relevant
+
+```{r}
+model_set_middle_value %>% 
+  ggplot() +
+  aes(x = age, y = incidence) +
+  geom_point() +
+  geom_smooth(method = lm, formula = y ~ poly(x, 3), se = F, colour = "#FF5722") +
+  theme_minimal() +
+  labs(title = "Correlation between Age and Brain Cancer Incidence",
+       x = "Age",
+       y = "Incidence") +
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 14, face = "bold"))
+```
+
 
 # Obesity
 
@@ -884,4 +985,41 @@ obesity_clean %>%
   theme_minimal()
 ```
 
+```{r}
+years_obesity_vector <- unique(obesity_clean$year)
+unique(incidence_all_ages$age)
 
+ages_obesity_vector <- c("0-4", "05-09", "10-14", "15-19", "20-24", "25-29", "30-34", "35-39", "40-44",
+                         "45-49", "50-54", "55-59", "60-64")
+
+obesity_model_set_bmi_25 <- incidence_all_ages %>% 
+  filter(cancer_type == "mal_brain_plus_glands",
+         sex == "all", 
+         age == "all",
+         hb == "scotland",
+         year %in% years_obesity_vector) %>% 
+  left_join(obesity_clean, by = "year") %>% 
+  filter(bmi == "25+")
+
+obesity_model_set_bmi_30 <- incidence_all_ages %>% 
+  filter(cancer_type == "mal_brain_plus_glands",
+         sex == "all", 
+         age == "all",
+         hb == "scotland",
+         year %in% years_obesity_vector) %>% 
+  left_join(obesity_clean, by = "year") %>% 
+  filter(bmi == "30+")
+
+bmi_25_model <- lm(incidence ~ percent_pop, data = obesity_model_set_bmi_25)
+
+summary(bmi_25_model)
+
+bmi_30_model <- lm(incidence ~ percent_pop, data = obesity_model_set_bmi_30)
+
+summary(bmi_30_model)
+```
+* although p values are significant I feel like this model is not appropriate to report as the age groups don't completely match up.
+* Obesity data ages are 16 - 64 until 2003 then 2008 onwards is 16 +
+* The incidence data could be manipulated to fit these age groups but that is a job for another time perhaps.
+* Limited data set for obesity data
+* Obesity is a Risk Factor for specific brain tumours (ie. meningioma) and I do not have the incidence for specific brain tumours. 
