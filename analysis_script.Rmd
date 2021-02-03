@@ -25,7 +25,8 @@ incidence_all_ages %>%
   aes(x = year, y = incidence) +
   geom_line() +
   facet_wrap(~ hb) +
-  labs(title = "Malignant tumours")
+  labs(title = "Malignant tumours") +
+  theme_minimal()
 
 incidence_all_ages %>%
   drop_na() %>% 
@@ -37,7 +38,34 @@ incidence_all_ages %>%
   aes(x = year, y = num_cases) +
   geom_line() +
   facet_wrap(~ hb) +
-  labs(title = "Malignant tumours")
+  labs(title = "Malignant tumours") +
+  theme_minimal()
+
+incidence_all_ages %>%
+  drop_na() %>% 
+  filter(sex == "all",
+         cancer_type == "mal_brain",
+         age == "all",
+         str_detect(hb, "scotland")) %>% 
+  ggplot() +
+  aes(x = year, y = incidence) +
+  geom_line() +
+  facet_wrap(~ hb) +
+  labs(title = "Malignant tumours") +
+  theme_minimal()
+
+incidence_all_ages %>%
+  drop_na() %>% 
+  filter(sex == "all",
+         cancer_type == "mal_brain",
+         age == "all",
+         str_detect(hb, "scotland")) %>% 
+  ggplot() +
+  aes(x = year, y = num_cases) +
+  geom_line() +
+  facet_wrap(~ hb) +
+  labs(title = "Malignant tumours") +
+  theme_minimal()
 ```
 
 * Big fluctuations in Incidence in Orkney, shetland, western isles and borders due to small population
@@ -55,7 +83,8 @@ incidence_all_ages %>%
   aes(x = year, y = incidence) +
   geom_line() +
   facet_wrap(~ hb) +
-  labs(title = "All tumours")
+  labs(title = "All tumours") + 
+  theme_minimal()
 
 incidence_all_ages %>% 
   drop_na() %>% 
@@ -67,7 +96,8 @@ incidence_all_ages %>%
   aes(x = year, y = num_cases) +
   geom_line() +
   facet_wrap(~ hb)+
-  labs(title = "All tumours")
+  labs(title = "All tumours") +
+  theme_minimal()
 ```
 
 * Same take aways as above
@@ -131,7 +161,8 @@ incidence_all_stats %>%
   ggplot() +
   aes(x = year, y = value, colour = value_type) +
   geom_line() +
-  facet_wrap(~ hb)
+  facet_wrap(~ hb) + 
+  theme_minimal()
 ```
 
 * Again lots of fluctuation due to small populations in health boards
@@ -147,7 +178,8 @@ incidence_all_stats %>%
   ggplot() +
   aes(x = year, y = value, colour = value_type) +
   geom_line() +
-  facet_wrap(~ sex)
+  facet_wrap(~ sex) +
+  theme_minimal()
 ```
 
 * As above regarding rates
@@ -279,7 +311,8 @@ mort_ages %>%
   aes(x = year, y = mortality_rate, colour = sex) +
   geom_line() +
   facet_wrap(~ cancer_type) +
-  labs(title = "Scotland, all ages")
+  labs(title = "Scotland, all ages") +
+  theme_minimal()
 
 mort_ages %>% 
   filter(hb == "scotland",
@@ -288,7 +321,8 @@ mort_ages %>%
   aes(x = year, y = num_deaths, colour = sex) +
   geom_line() +
   facet_wrap(~ cancer_type) +
-  labs(title = "Scotland, all ages")
+  labs(title = "Scotland, all ages") +
+  theme_minimal()
 ```
 
 * Mortality rate is higher in males and increases from 1994 to 2018...is this just because incidence is higher or are people dying at higher rate once diagnosed?...need to review mortality rate definition
@@ -302,17 +336,41 @@ survival_clean %>%
   filter(age_group == "15-99") %>% 
   ggplot() +
   aes(x = calendar_period_of_diagnosis, y = observed_survival_percent, fill = sex) +
-  geom_col() +
+  geom_col(position = "dodge") +
   facet_wrap(~ years_since_diagnosis) +
-  labs(title = "age 15-99")
+  labs(title = "age 15-99, brain") +
+  ylim(0, 100) +
+  theme_minimal()
 
 survival_clean %>% 
   filter(age_group == "15-99") %>% 
   ggplot() +
   aes(x = calendar_period_of_diagnosis, y = net_survival_percent, fill = sex) +
-  geom_col() +
+  geom_col(position = "dodge") +
   facet_wrap(~ years_since_diagnosis) +
-  labs(title = "age 15-99")
+  labs(title = "age 15-99, brain") +
+  ylim(0, 100) +
+  theme_minimal()
+
+leukaemia_survival_clean %>% 
+  filter(age_group == "15-99") %>% 
+  ggplot() +
+  aes(x = calendar_period_of_diagnosis, y = observed_survival_percent, fill = sex) +
+  geom_col(position = "dodge") +
+  facet_wrap(~ years_since_diagnosis) +
+  labs(title = "age 15-99, leukaemia") +
+  ylim(0, 100) +
+  theme_minimal()
+
+leukaemia_survival_clean %>% 
+  filter(age_group == "15-99") %>% 
+  ggplot() +
+  aes(x = calendar_period_of_diagnosis, y = net_survival_percent, fill = sex) +
+  geom_col(position = "dodge") +
+  facet_wrap(~ years_since_diagnosis) +
+  labs(title = "age 15-99, leukamia") +
+  ylim(0, 100) +
+  theme_minimal()
 ```
 
 * Increase in 1 year survival but no change in 5 year survival
@@ -323,16 +381,40 @@ survival_clean %>%
          years_since_diagnosis == "10") %>% 
   ggplot() +
   aes(x = calendar_period_of_diagnosis, y = observed_survival_percent, fill = sex) +
-  geom_col() +
-  labs(title = "age 15-74")
+  geom_col(position = "dodge") +
+  ylim(0, 100) +
+  labs(title = "age 15-74") +
+  theme_minimal()
 
 survival_clean %>% 
   filter(age_group == "15-74",
          years_since_diagnosis == "10") %>% 
   ggplot() +
   aes(x = calendar_period_of_diagnosis, y = net_survival_percent, fill = sex) +
-  geom_col() +
-  labs(title = "age 15-74")
+  geom_col(position = "dodge") +
+  ylim(0, 100) +
+  labs(title = "age 15-74") +
+  theme_minimal()
+
+leukaemia_survival_clean %>% 
+  filter(age_group == "15-74",
+         years_since_diagnosis == "10") %>% 
+  ggplot() +
+  aes(x = calendar_period_of_diagnosis, y = observed_survival_percent, fill = sex) +
+  geom_col(position = "dodge") +
+  ylim(0, 100) +
+  labs(title = "age 15-74, leukaemia") +
+  theme_minimal()
+
+leukaemia_survival_clean %>% 
+  filter(age_group == "15-74",
+         years_since_diagnosis == "10") %>% 
+  ggplot() +
+  aes(x = calendar_period_of_diagnosis, y = net_survival_percent, fill = sex) +
+  geom_col(position = "dodge") +
+  ylim(0, 100) +
+  labs(title = "age 15-74, leukaemia") +
+  theme_minimal()
 ```
 
 * 10 year survival for ages 15 - 74 has not changed much 
@@ -358,7 +440,13 @@ survival_clean %>%
   geom_col() +
   facet_wrap(~ calendar_period_of_diagnosis, ncol = 1) +
   coord_flip() +
-  labs(title = "1 year sruvival, male")
+  ylim(0, 100) +
+  labs(title = "1 year survival, male, brain") +
+  theme_minimal() +
+   theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.grid.major.y = element_blank())
   
  survival_clean %>% 
   filter(age_group %in% c("15-44", "45-54", "55-64", "65-74", "75-99"),
@@ -369,7 +457,47 @@ survival_clean %>%
   geom_col() +
   facet_wrap(~ calendar_period_of_diagnosis, ncol = 1) +
    coord_flip() +
-   labs(title = "1 year survival, female")
+   ylim(0, 100) +
+   labs(title = "1 year survival, female, brain") +
+  theme_minimal() +
+   theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.grid.major.y = element_blank())
+ 
+ leukaemia_survival_clean %>% 
+  filter(age_group %in% c("15-44", "45-54", "55-64", "65-74", "75-99"),
+         sex == "Male",
+         years_since_diagnosis == 1) %>% 
+  ggplot() +
+  aes(x = age_group, y = net_survival_percent, fill = age_group) +
+  geom_col() +
+  facet_wrap(~ calendar_period_of_diagnosis, ncol = 1) +
+  coord_flip() +
+  labs(title = "1 year survival, male, leukaemia") +
+  ylim(0, 100) +
+  theme_minimal() +
+   theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.grid.major.y = element_blank())
+  
+ leukaemia_survival_clean %>% 
+  filter(age_group %in% c("15-44", "45-54", "55-64", "65-74", "75-99"),
+         sex == "Female",
+         years_since_diagnosis == 1) %>% 
+  ggplot() +
+  aes(x = age_group, y = net_survival_percent, fill = age_group) +
+  geom_col() +
+  facet_wrap(~ calendar_period_of_diagnosis, ncol = 1) +
+   coord_flip() +
+   ylim(0, 100) +
+   labs(title = "1 year survival, female, leukaemia") +
+  theme_minimal() +
+   theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.grid.major.y = element_blank())
 ```
 
 ```{r}
@@ -380,10 +508,15 @@ survival_clean %>%
   ggplot() +
   aes(x = age_group, y = net_survival_percent, fill = age_group) +
   geom_col() +
-  scale_y_continuous(n.breaks = 5) +
   facet_wrap(~ calendar_period_of_diagnosis, ncol = 1) +
   coord_flip() +
-  labs(title = "5 year sruvival, male")
+  labs(title = "5 year sruvival, male, brain") +
+  ylim(0, 100) +
+  theme_minimal() +
+   theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.grid.major.y = element_blank())
   
  survival_clean %>% 
   filter(age_group %in% c("15-44", "45-54", "55-64", "65-74", "75-99"),
@@ -392,10 +525,49 @@ survival_clean %>%
   ggplot() +
   aes(x = age_group, y = net_survival_percent, fill = age_group) +
   geom_col() +
-   scale_y_continuous(n.breaks = 10) +
   facet_wrap(~ calendar_period_of_diagnosis, ncol = 1) +
    coord_flip() +
-   labs(title = "5 year survival, female")
+   labs(title = "5 year survival, female, brain") +
+   ylim(0, 100) +
+  theme_minimal() +
+   theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.grid.major.y = element_blank())
+ 
+ leukaemia_survival_clean %>% 
+  filter(age_group %in% c("15-44", "45-54", "55-64", "65-74", "75-99"),
+         sex == "Male",
+         years_since_diagnosis == 5) %>% 
+  ggplot() +
+  aes(x = age_group, y = net_survival_percent, fill = age_group) +
+  geom_col() +
+  facet_wrap(~ calendar_period_of_diagnosis, ncol = 1) +
+  coord_flip() +
+  labs(title = "5 year sruvival, male, leukaemia") +
+  ylim(0, 100) +
+  theme_minimal() +
+   theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.grid.major.y = element_blank())
+  
+ leukaemia_survival_clean %>% 
+  filter(age_group %in% c("15-44", "45-54", "55-64", "65-74", "75-99"),
+         sex == "Female",
+         years_since_diagnosis == 5) %>% 
+  ggplot() +
+  aes(x = age_group, y = net_survival_percent, fill = age_group) +
+  geom_col() +
+  facet_wrap(~ calendar_period_of_diagnosis, ncol = 1) +
+   coord_flip() +
+   labs(title = "5 year survival, female, leukaemia") +
+   ylim(0, 100) +
+  theme_minimal() +
+   theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.grid.major.y = element_blank())
 ```
 
 ```{r}
@@ -406,10 +578,15 @@ survival_clean %>%
   ggplot() +
   aes(x = age_group, y = net_survival_percent, fill = age_group) +
   geom_col() +
-  scale_y_continuous(n.breaks = 5) +
   facet_wrap(~ calendar_period_of_diagnosis, ncol = 1) +
   coord_flip() +
-  labs(title = "10 year sruvival, male")
+  labs(title = "10 year sruvival, male, brain") +
+   ylim(0, 100) +
+  theme_minimal() +
+   theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.grid.major.y = element_blank())
   
  survival_clean %>% 
   filter(age_group %in% c("15-44", "45-54", "55-64", "65-74", "75-99"),
@@ -418,10 +595,49 @@ survival_clean %>%
   ggplot() +
   aes(x = age_group, y = net_survival_percent, fill = age_group) +
   geom_col() +
-   scale_y_continuous(n.breaks = 10) +
   facet_wrap(~ calendar_period_of_diagnosis, ncol = 1) +
    coord_flip() +
-   labs(title = "10 year survival, female")
+   labs(title = "10 year survival, female, brain") +
+   ylim(0, 100) +
+  theme_minimal() +
+   theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.grid.major.y = element_blank())
+ 
+leukaemia_survival_clean %>% 
+  filter(age_group %in% c("15-44", "45-54", "55-64", "65-74", "75-99"),
+         sex == "Male",
+         years_since_diagnosis == 10) %>% 
+  ggplot() +
+  aes(x = age_group, y = net_survival_percent, fill = age_group) +
+  geom_col() +
+  facet_wrap(~ calendar_period_of_diagnosis, ncol = 1) +
+  coord_flip() +
+  labs(title = "10 year sruvival, male, leukaemia") +
+   ylim(0, 100) +
+  theme_minimal() +
+   theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.grid.major.y = element_blank())
+  
+ leukaemia_survival_clean %>% 
+  filter(age_group %in% c("15-44", "45-54", "55-64", "65-74", "75-99"),
+         sex == "Female",
+         years_since_diagnosis == 10) %>% 
+  ggplot() +
+  aes(x = age_group, y = net_survival_percent, fill = age_group) +
+  geom_col() +
+  facet_wrap(~ calendar_period_of_diagnosis, ncol = 1) +
+   coord_flip() +
+   labs(title = "10 year survival, female, leukaemia") +
+   ylim(0, 100) +
+  theme_minimal() +
+   theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        panel.grid.major.y = element_blank())
 ```
 
 
@@ -627,11 +843,16 @@ incidence_all_ages %>%
          sex == "all") %>% 
   ggplot() +
   aes(x = age, y = incidence, colour = year) +
-  geom_point()
+  geom_point() 
+```
+
+
+```{r}
+
 ```
 
 ```{r}
-incidence_all_ages %>% 
+model_set <- incidence_all_ages %>% 
   filter(hb == "scotland",
          cancer_type == "all",
          sex == "all",
@@ -639,12 +860,28 @@ incidence_all_ages %>%
   drop_na() %>% 
   mutate(age = str_extract(age, "[0-9]+[-+]"),
          age = str_remove_all(age, "[-+]"),
-         age = as.numeric(age)) %>% 
-  summarise(cor(age, incidence))
+         age = as.numeric(age)) 
+
+model_obj <- lm(incidence ~ poly(age,2), data=model_set)
+
+model_obj_3 <- lm(incidence ~ poly(age,3), data=model_set)
+summary(model_obj)
+
+summary(model_obj_3)
 ```
 * Pretty sketchy and probably isn't statistically significant as the data is binned but perhaps shows that if the full data was available that a significant positive correlation is present. 
 
 * wots the point of including this?
 
+# Obesity
+
+```{r}
+obesity_clean %>% 
+  ggplot() +
+  aes(x = year, y = percent_pop, fill = bmi) +
+  geom_col(position = "dodge") +
+  scale_y_continuous(breaks = c(0, 10, 20, 30, 40, 50, 60, 70)) +
+  theme_minimal()
+```
 
 

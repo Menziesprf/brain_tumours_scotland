@@ -7,6 +7,8 @@ library(stringi)
 
 excel_sheets("data/cancer-incidence-brain-and-cns.xls")
 
+inc_notes <- read_xls("data/cancer-incidence-brain-and-cns.xls", sheet = 2)
+
 all_ann_inc_data <- read_xls("data/cancer-incidence-brain-and-cns.xls", sheet = 7)
 
 all_ann_inc_data_clean <- all_ann_inc_data %>%
@@ -48,6 +50,8 @@ all_ann_inc_data_clean <- all_ann_inc_data %>%
          sex = sex_label,
          age = age_label)
 
+
+
 # 1A: AGES 
 
 incidence_all_ages <- all_ann_inc_data_clean %>% 
@@ -78,9 +82,37 @@ incidence_all_stats <- all_ann_inc_data_clean %>%
                values_to = "value")
 
 
-  
+# Regions 
 
-rm(all_ann_inc_data, all_ann_inc_data_clean)
+north <- c("western isles", "highland", "grampian", "tayside", "orkney", "shetland", "north of scotland")
+west <-  c("forth valley", "greater glasgow and clyde", "lanarkshire", "ayrshire and arran", "west of scotland")
+southeast = c("fife", "lothian", "borders", "dumfries and galloway", "south east of scotland")
+
+unique(incidence_all_ages$hb)
+
+
+
+regional_incidence_map_prep <- incidence_all_ages %>% 
+  filter(hb != "scotland") %>% 
+  mutate(region_flag = case_when(
+                          hb %in% north ~ "north",
+                          hb %in% west ~ "west",
+                          hb %in% southeast ~ "southeast",
+                          T ~ "NA"))
+
+regions_temp <- regional_incidence_map_prep %>% 
+  filter(hb %in% c("north of scotland", "west of scotland", "south east of scotland")) %>% 
+  select(-hb) %>% 
+  rename(num_cases_region = num_cases,
+         inc_region = incidence)
+
+regional_incidence_map <- regional_incidence_map_prep %>% 
+  filter(!hb  %in% c("north of scotland", "west of scotland", "south east of scotland")) %>% 
+  left_join(regions_temp, by = c("cancer_type", "sex", "age", "year", "region_flag"))
+
+
+
+rm(all_ann_inc_data, all_ann_inc_data_clean, regions_temp, regional_incidence_map_prep)
 
 # ------------ DATASET 2: Mortality  ------------
 
@@ -160,9 +192,11 @@ survival_notes
 survival_notes2 <- read_xlsx("data/estimates-of-survival-from-brain-and-other-cns-cancers.xlsx", sheet = 7)
 
 # survival @ 1, 3 5 & 10 years 1987 - 2017
-# Brain and other CNS (ICD-9 191-192; ICD-10 C70-C72, C75.1-C75.3)
+# Brain and other CNS (ICD-9 191-192; ICD-10 C70-C72, C75.1-C75.3) - only malignant neoplasms, includes glands and ducts
 # NA's when less than 10 patients alive at 1, 5 or 10 years or when there is little change from previous time period
 # NA's dropped 
+
+unique(survival_all_data$cancer_site_grouping)
 
 survival_clean <- survival_all_data %>% 
   mutate(across(.cols = observed_survival_percent:upper_95_percent_ci_for_net_survival, 
@@ -465,8 +499,36 @@ pop_2017_all_clean <- pop_2017_all %>%
   group_by(over_65) %>% 
   mutate(percentage_pop = (count_over_65/total_pop*100))
 
+pop_1994_all <- read_csv("data/census/mid-year-pop-est-19-time-series-3/mid-year-pop-est-19-time-series-3_1994.csv",
+                         skip = 2, col_names = TRUE, n_max = 17)
+
+pop_1994_all_clean <- pop_1994_all %>% 
+  drop_na() %>% 
+  rename(hb = Persons) %>% 
+  select(-"All ages", -Code) %>% 
+  filter(hb != "Scotland") %>% 
+  pivot_longer(cols = "0":"90+",
+               names_to = "age",
+               values_to = "count") %>% 
+  mutate(age = recode(age,
+                      "90+" = "90"),
+         age = as.numeric(age),
+         over_65 = case_when(age < 65 ~ "under_65",
+                             T ~ "over_65")) %>% 
+  group_by(over_65, hb) %>% 
+  mutate(count_over_65 = sum(count)) %>%
+  select(-age, -count) %>% 
+  distinct() %>%
+  ungroup() %>% 
+  group_by(hb) %>% 
+  mutate(total_pop = sum(count_over_65)) %>% 
+  group_by(over_65) %>% 
+  mutate(percentage_pop = (count_over_65/total_pop*100))
+
 rm(pop_2019_female, pop_2019_female_clean, pop_2019_male, 
    pop_2019_male_clean, groups, pop_2019_all, pop_2017_all)
+
+# midyear pop estimates from "national records of scotland" 
 
 
 # -------------- Map prep -------------
@@ -491,8 +553,67 @@ incidence_map_prep <- incidence_all_stats %>%
   filter(hb %in% health_boards) %>% 
   left_join(hb_code_df, by = "hb")
 
+# ------------ Obesity ----------
 
+excel_sheets("data/obesity/tables.xls")
+
+obesity_notes <- read_xls("data/obesity/tables.xls", sheet = 1)
+
+obesity_data_raw <- read_xls("data/obesity/tables.xls", sheet = 4, skip = 3, col_names = TRUE, n_max = 10) %>% 
+  clean_names()
+
+obesity_data <- obesity_data_raw %>% 
+  select(-x3, -x4, -x6, -x7, -x8, -x9, -x11, -x12, -x13, -x14) %>% 
+  slice(-c(1:4))
+  
+obesity_bmi_25_plus <- obesity_data %>% 
+  slice(c(2,3)) %>% 
+  mutate(x1995f = as.double(x1995f)) %>% 
+  pivot_longer(cols = x1995f:x2019, 
+               names_to = "year", 
+               values_to = "percent_pop") %>% 
+  rename(age = body_mass_index_bmi_kg_m2) %>% 
+  mutate(year = str_extract(year, "[0-9]+"),
+         age = str_remove(age, "c"),
+         year = as.double(year),
+         bmi = "25+") %>% 
+  filter(age == "16-64") 
+
+obesity_bmi_30_plus <- obesity_data %>% 
+  slice(c(5,6)) %>% 
+  mutate(x1995f = as.double(x1995f)) %>% 
+  pivot_longer(cols = x1995f:x2019, 
+               names_to = "year", 
+               values_to = "percent_pop") %>% 
+  rename(age = body_mass_index_bmi_kg_m2) %>% 
+  mutate(year = str_extract(year, "[0-9]+"),
+         age = str_remove(age, "c"),
+         year = as.double(year),
+         bmi = "30+") %>% 
+  filter(age == "16-64")
+
+obesity_clean <- obesity_bmi_25_plus %>% 
+  bind_rows(obesity_bmi_30_plus)
+
+rm(obesity_bmi_25_plus, obesity_bmi_30_plus, obesity_data, obesity_data_raw, obesity_notes)
+
+# source: https://www.gov.scot/publications/diet-healthy-weight-monitoring-report-2020/
+
+# ----------- Leukaemia Survival ------------
+
+excel_sheets("data/leukaemia/estimates-of-survival-from-leukaemias.xlsx")
+
+leukaemia_raw <- read_xlsx("data/leukaemia/estimates-of-survival-from-leukaemias.xlsx", sheet = 5) %>% 
+  clean_names()
+
+leukaemia_survival_clean <- leukaemia_raw %>% 
+  mutate(across(.cols = observed_survival_percent:upper_95_percent_ci_for_net_survival, 
+              .fns = as.double)) %>% 
+  select(-cancer_site_grouping) %>% 
+  drop_na()
+
+rm(leukaemia_raw)
 # ------------- END ---------------
 
-# midyear pop estimates from "national records of scotland" 
+
 
