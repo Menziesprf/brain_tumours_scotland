@@ -222,7 +222,6 @@ excel_sheets("data/deprivation-brain-and-cns.xls")
 deprivation_incidence_data <- read_xls("data/deprivation-brain-and-cns.xls", sheet = 1, range = "A11:G18", col_names = T) %>% 
   clean_names() 
 
-
 deprivation_incidence_clean <- deprivation_incidence_data %>% 
   select(-x2, -x4) %>% 
   filter(!is.na(easr)) %>% 
@@ -231,7 +230,27 @@ deprivation_incidence_clean <- deprivation_incidence_data %>%
          inc_upper_ci_95 = upper_95_percent_ci)
       
 
+excel_sheets("data/deprivation-all-cancers.xls")
 
+dep_all <- read_xls("data/deprivation-all-cancers.xls", sheet = 1, range = "A11:G18", col_names = T) %>% 
+  clean_names()
+
+deprivation_all_incidence_clean <- dep_all %>% 
+  select(-x2, -x4) %>% 
+  filter(!is.na(easr)) %>% 
+  rename(incidence_easr = easr,
+         inc_lower_ci_95 = lower_95_percent_ci,
+         inc_upper_ci_95 = upper_95_percent_ci)
+
+dep_lung <- read_xls("data/deprivation-lung.xls", sheet = 1, range = "A11:G18", col_names = T) %>% 
+  clean_names()
+
+deprivation_lung_incidence_clean <- dep_lung %>% 
+  select(-x2, -x4) %>% 
+  filter(!is.na(easr)) %>% 
+  rename(incidence_easr = easr,
+         inc_lower_ci_95 = lower_95_percent_ci,
+         inc_upper_ci_95 = upper_95_percent_ci)
 
 
 excel_sheets("data/mal_cns_deprivation.xls")

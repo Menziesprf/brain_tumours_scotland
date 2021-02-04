@@ -76,9 +76,25 @@ incidence_all_ages %>%
          str_detect(hb, "scotland")) %>% 
   ggplot() +
   aes(x = year, y = incidence, colour = hb) +
-  geom_line() +
+  geom_line(size = 1.5) +
+  scale_colour_manual(values = c("north of scotland" = "#FF5722",
+                     "west of scotland" = "#132B43",
+                     "south east of scotland" = "#56B1F7"),
+                     labels = c("north of scotland" = "North", 
+                                "south east of scotland" = "South-East", 
+                                "west of scotland" = "West")) +
   labs(title = "Malignant tumours") +
-  theme_minimal()
+  ylim(5, 11) +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 14, face = "bold"),
+        panel.grid.minor.x =  element_blank()) +
+  scale_x_continuous(breaks = c(1994, 1998, 2002, 2008, 2012, 2016, 2018)) +
+  labs(title = "Incidence of Malignant Brain Tumours by Region",
+       x = "Year",
+       y = "Incidence",
+       colour = "Region")
 ```
 
 * Big fluctuations in Incidence in Orkney, shetland, western isles and borders due to small population
@@ -175,7 +191,7 @@ incidence_all_ages %>%
   aes(x = year, y = incidence) +
   geom_line(colour = "#FF5722", size = 2) +
   ylim(6.5, 9) +
-  labs(title = "Incidence of Malignant Brain Cancer in Scotland",
+  labs(title = "Incidence of Malignant Brain Tumours in Scotland",
        x = "Year",
        y = "Incidence") +
   scale_x_continuous(breaks = c(1994, 1998, 2002, 2008, 2012, 2016, 2018)) +
@@ -420,6 +436,87 @@ leukaemia_survival_clean %>%
 
 ```{r}
 survival_clean %>% 
+  filter(age_group == "15-99",
+         years_since_diagnosis == 1) %>% 
+  ggplot() +
+  aes(x = calendar_period_of_diagnosis, y = net_survival_percent, fill = sex) +
+  geom_col(position = "dodge") +
+  labs(title = "Malignant Brain Tumour 1 Year Survival Rate",
+       x = "Year of Diagnosis",
+       y = "Net Survival Percent",
+       fill = "Sex") +
+  scale_fill_manual(values = c("Female" = "#FF5722",
+                                "Male" = "#132B43")) +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 14, face = "bold"),
+        panel.grid.minor.x =  element_blank()) +
+  ylim(0, 100)
+
+
+leukaemia_survival_clean %>% 
+  filter(age_group == "15-99",
+         years_since_diagnosis == 1) %>% 
+  ggplot() +
+  aes(x = calendar_period_of_diagnosis, y = net_survival_percent, fill = sex) +
+  geom_col(position = "dodge") +
+  labs(title = "Leukaemia 1 Year Survival Rate",
+       x = "Year of Diagnosis",
+       y = "Net Survival Percent",
+       fill = "Sex") +
+  scale_fill_manual(values = c("Female" = "#FF5722",
+                                "Male" = "#132B43")) +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 14, face = "bold"),
+        panel.grid.minor.x =  element_blank()) +
+  ylim(0, 100)
+
+survival_clean %>% 
+  filter(age_group == "15-99",
+         years_since_diagnosis == 5) %>% 
+  ggplot() +
+  aes(x = calendar_period_of_diagnosis, y = net_survival_percent, fill = sex) +
+  geom_col(position = "dodge") +
+  labs(title = "Malignant Brain Tumour 5 Year Survival Rate",
+       x = "Year of Diagnosis",
+       y = "Net Survival Percent",
+       fill = "Sex") +
+  scale_fill_manual(values = c("Female" = "#FF5722",
+                                "Male" = "#132B43")) +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 14, face = "bold"),
+        panel.grid.minor.x =  element_blank()) +
+  ylim(0, 100)
+
+
+leukaemia_survival_clean %>% 
+  filter(age_group == "15-99",
+         years_since_diagnosis == 5) %>% 
+  ggplot() +
+  aes(x = calendar_period_of_diagnosis, y = net_survival_percent, fill = sex) +
+  geom_col(position = "dodge") +
+  labs(title = "Leukaemia 5 Year Survival Rate",
+       x = "Year of Diagnosis",
+       y = "Net Survival Percent",
+       fill = "Sex") +
+  scale_fill_manual(values = c("Female" = "#FF5722",
+                                "Male" = "#132B43")) +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 14, face = "bold"),
+        panel.grid.minor.x =  element_blank()) +
+  ylim(0, 100)
+```
+
+
+```{r}
+survival_clean %>% 
   filter(age_group == "15-74",
          years_since_diagnosis == "10") %>% 
   ggplot() +
@@ -475,21 +572,29 @@ unique(survival_clean$age_group)
 
 ```{r}
 survival_clean %>% 
-  filter(age_group %in% c("15-44", "45-54", "55-64", "65-74", "75-99"),
+  filter(age_group %in% c("75-99", "65-74", "55-64", "45-54", "15-44"),
          sex == "Male",
          years_since_diagnosis == 1) %>% 
   ggplot() +
   aes(x = age_group, y = net_survival_percent, fill = age_group) +
   geom_col() +
+  scale_x_discrete(labels = c("75-99", "65-74", "55-64", "45-54", "15-44")) +
   facet_wrap(~ calendar_period_of_diagnosis, ncol = 1) +
   coord_flip() +
   ylim(0, 100) +
-  labs(title = "1 year survival, male, brain") +
+  scale_fill_brewer(palette = "Set1") +
+  labs(title = "Male 1 Year Survival Percentage by Age Group",
+       y = "Net Survival Percentage",
+       fill = "Age Group") +
+  guides(fill = guide_legend(reverse = TRUE)) +
   theme_minimal() +
    theme(axis.title.y = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
-        panel.grid.major.y = element_blank())
+        panel.grid.major.y = element_blank(),
+        plot.title = element_text(size = 18, hjust = 0.5),
+        axis.text = element_text(size = 12),
+        axis.title.x = element_text(size = 12, face = "bold"))
   
  survival_clean %>% 
   filter(age_group %in% c("15-44", "45-54", "55-64", "65-74", "75-99"),
@@ -501,12 +606,20 @@ survival_clean %>%
   facet_wrap(~ calendar_period_of_diagnosis, ncol = 1) +
    coord_flip() +
    ylim(0, 100) +
-   labs(title = "1 year survival, female, brain") +
+   labs(title = "Female 1 Year Survival Percentage by Age Group",
+        y = "Net Survival Percentage",
+        fill = "Age Group") +
+   scale_fill_brewer(palette = "Set1") +
+   guides(fill = guide_legend(reverse = TRUE)) +
   theme_minimal() +
    theme(axis.title.y = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
-        panel.grid.major.y = element_blank())
+        panel.grid.major.y = element_blank(),
+        plot.title = element_text(size = 18, hjust = 0.5),
+        axis.text = element_text(size = 12),
+        axis.title.x = element_text(size = 12, face = "bold"),
+        plot.subtitle = element_text(size = 14, face = "bold"))
  
  leukaemia_survival_clean %>% 
   filter(age_group %in% c("15-44", "45-54", "55-64", "65-74", "75-99"),
@@ -965,7 +1078,7 @@ model_set_middle_value %>%
   geom_point() +
   geom_smooth(method = lm, formula = y ~ poly(x, 3), se = F, colour = "#FF5722") +
   theme_minimal() +
-  labs(title = "Correlation between Age and Brain Cancer Incidence",
+  labs(title = "Correlation between Age and Brain Tumour Incidence",
        x = "Age",
        y = "Incidence") +
   theme(plot.title = element_text(size = 18, hjust = 0.5),
@@ -1023,3 +1136,52 @@ summary(bmi_30_model)
 * The incidence data could be manipulated to fit these age groups but that is a job for another time perhaps.
 * Limited data set for obesity data
 * Obesity is a Risk Factor for specific brain tumours (ie. meningioma) and I do not have the incidence for specific brain tumours. 
+
+# Deprivation 
+
+```{r}
+deprivation_complete %>% 
+  ggplot() +
+  aes(x = simd_2016_deprivation_quintile, y = incidence_easr) +
+  geom_col(fill = "#Ff5722") +
+  ylim(0, 10) +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 14, face = "bold"),
+        panel.grid.minor.x =  element_blank()) +
+  scale_x_discrete(labels = c("1", "2", "3", "4", "5")) +
+  labs(title = "Incidence of Malignant Brain Tumour by SIMD Quintile",
+       x = "SIMD Quintile",
+       y = "Incidence")
+
+deprivation_all_incidence_clean %>% 
+  ggplot() +
+  aes(x = simd_2016_deprivation_quintile, y = incidence_easr) +
+  geom_col(fill = "#56B1F7") +
+   theme_minimal() +
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 14, face = "bold"),
+        panel.grid.minor.x =  element_blank()) +
+  scale_x_discrete(labels = c("1", "2", "3", "4", "5")) +
+  labs(title = "Incidence of All Cancers by SIMD Quintile",
+       x = "SIMD Quintile",
+       y = "Incidence")
+
+deprivation_lung_incidence_clean %>% 
+  ggplot() +
+  aes(x = simd_2016_deprivation_quintile, y = incidence_easr) +
+  geom_col(fill = "#132B43") +
+   theme_minimal() +
+  theme(plot.title = element_text(size = 18, hjust = 0.5),
+        axis.text = element_text(size = 12),
+        axis.title = element_text(size = 14, face = "bold"),
+        panel.grid.minor.x =  element_blank()) +
+  scale_x_discrete(labels = c("1", "2", "3", "4", "5")) +
+  labs(title = "Incidence of Lung Cancer by SIMD Quintile",
+       x = "SIMD Quintile",
+       y = "Incidence")
+  
+```
+
