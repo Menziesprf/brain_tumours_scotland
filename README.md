@@ -1,4 +1,4 @@
-# brain_tumours_scotland
+# Brain Tumours in Scotland project
 
 This was the final project I completed as part of Codeclan's data analysis course.
 
